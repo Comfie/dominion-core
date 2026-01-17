@@ -56,20 +56,20 @@ export async function GET() {
     ]);
 
     // Format data for the AI
-    const formattedObligations = obligations.map(o => ({
+    const formattedObligations = obligations.map((o: any) => ({
       name: o.name,
       amount: Number(o.amount),
       category: o.category,
       isUncompromised: o.isUncompromised,
     }));
 
-    const formattedPayments = payments.map(p => ({
+    const formattedPayments = payments.map((p: any) => ({
       amount: Number(p.amount),
       paidAt: p.paidAt.toISOString(),
       obligationName: p.obligation.name,
     }));
 
-    const formattedExpenses = expenses.map(e => ({
+    const formattedExpenses = expenses.map((e: any) => ({
       name: e.name,
       amount: Number(e.amount),
       category: e.category,
@@ -77,7 +77,7 @@ export async function GET() {
       person: e.person?.name || null,
     }));
 
-    const formattedIncomes = incomes.map(i => ({
+    const formattedIncomes = incomes.map((i: any) => ({
       name: i.name,
       amount: Number(i.amount),
       source: i.source,
@@ -87,14 +87,14 @@ export async function GET() {
 
     const monthlyIncome = settings?.monthlyIncome ? Number(settings.monthlyIncome) : 0;
     const globalBudget = settings?.monthlyBudget ? Number(settings.monthlyBudget) : null;
-    const totalExtraIncome = formattedIncomes.reduce((sum, i) => sum + i.amount, 0);
-    const totalExpenses = formattedExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalExtraIncome = formattedIncomes.reduce((sum: number, i: any) => sum + i.amount, 0);
+    const totalExpenses = formattedExpenses.reduce((sum: number, e: any) => sum + e.amount, 0);
 
     // Calculate per-person spending vs budget
-    const personBudgets = persons.map(p => {
+    const personBudgets = persons.map((p: any) => {
       const personExpenses = expenses
-        .filter(e => e.person?.id === p.id)
-        .reduce((sum, e) => sum + Number(e.amount), 0);
+        .filter((e: any) => e.person?.id === p.id)
+        .reduce((sum: number, e: any) => sum + Number(e.amount), 0);
       return {
         name: p.name,
         budgetLimit: p.budgetLimit ? Number(p.budgetLimit) : null,

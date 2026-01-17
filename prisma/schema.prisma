@@ -3,12 +3,12 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  previewFeatures = ["driverAdapters"]
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ==================== AUTH MODELS ====================

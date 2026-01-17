@@ -6,13 +6,21 @@ import { X, Loader2, ShoppingBag } from 'lucide-react';
 import { Category, categoryConfig, Person } from '@/types/finance';
 import { format } from 'date-fns';
 
+interface InitialExpenseData {
+    name?: string;
+    amount?: number;
+    category?: string;
+    date?: string;
+}
+
 interface AddExpenseModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    initialData?: InitialExpenseData | null;
 }
 
-export function AddExpenseModal({ isOpen, onClose, onSuccess }: AddExpenseModalProps) {
+export function AddExpenseModal({ isOpen, onClose, onSuccess, initialData }: AddExpenseModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [persons, setPersons] = useState<Person[]>([]);
@@ -25,15 +33,26 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess }: AddExpenseModalP
         notes: '',
     });
 
-    // Fetch persons for dropdown
+    // Fetch persons for dropdown and apply initial data
     useEffect(() => {
         if (isOpen) {
             fetch('/api/persons')
                 .then(res => res.json())
                 .then(data => setPersons(data))
                 .catch(() => setPersons([]));
+
+            // Pre-fill form with initial data (from receipt scan)
+            if (initialData) {
+                setFormData(prev => ({
+                    ...prev,
+                    name: initialData.name || prev.name,
+                    amount: initialData.amount?.toString() || prev.amount,
+                    category: (initialData.category as Category) || prev.category,
+                    date: initialData.date || prev.date,
+                }));
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, initialData]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -41,6 +41,12 @@ export default function Dashboard() {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [editingObligation, setEditingObligation] = useState<Obligation | null>(null);
   const [paymentObligation, setPaymentObligation] = useState<Obligation | null>(null);
+  const [scannedExpenseData, setScannedExpenseData] = useState<{
+    name?: string;
+    amount?: number;
+    category?: string;
+    date?: string;
+  } | null>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -426,17 +432,27 @@ export default function Dashboard() {
         isOpen={isScanModalOpen}
         onClose={() => setIsScanModalOpen(false)}
         onSuccess={(data) => {
-          console.log('Scanned receipt:', data);
+          // Store scanned data and open expense modal
+          setScannedExpenseData({
+            name: data.storeName,
+            amount: data.total,
+            category: data.category,
+            date: data.date,
+          });
           setIsScanModalOpen(false);
-          // TODO: Pre-fill expense modal with scanned data
+          setIsExpenseModalOpen(true);
         }}
       />
 
       {/* Add Expense Modal */}
       <AddExpenseModal
         isOpen={isExpenseModalOpen}
-        onClose={() => setIsExpenseModalOpen(false)}
+        onClose={() => {
+          setIsExpenseModalOpen(false);
+          setScannedExpenseData(null);
+        }}
         onSuccess={fetchData}
+        initialData={scannedExpenseData}
       />
 
       {/* Add Income Modal */}

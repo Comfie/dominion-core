@@ -1,0 +1,246 @@
+// Dominion Core - Personal Finance Dashboard
+// Database schema with multi-user authentication
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== AUTH MODELS ====================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?   // For credentials auth
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  obligations   Obligation[]
+  payments      Payment[]
+  receipts      Receipt[]
+  snapshots     MonthlySnapshot[]
+  settings      Settings?
+  persons       Person[]
+  expenses      Expense[]
+  incomes       Income[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==================== FINANCE MODELS ====================
+
+enum Category {
+  HOUSING
+  DEBT
+  LIVING
+  SAVINGS
+  INSURANCE
+  UTILITIES
+  TRANSPORT
+  GROCERIES
+  DINING
+  ENTERTAINMENT
+  SHOPPING
+  OTHER
+}
+
+enum IncomeSource {
+  SALARY
+  FREELANCE
+  SIDE_HUSTLE
+  SALE
+  RENTAL
+  GIFT
+  INVESTMENT
+  REFUND
+  OTHER
+}
+
+// Person - for associating expenses with family members
+model Person {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String       // "Wife", "Kids", "Mom", etc.
+  budgetLimit Decimal?     @db.Decimal(10, 2) // Monthly budget limit for this person
+  createdAt   DateTime     @default(now())
+  obligations Obligation[]
+  expenses    Expense[]
+
+  @@index([userId])
+}
+
+// Obligation - recurring fixed costs (debit orders)
+model Obligation {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  provider        String
+  category        Category
+  amount          Decimal   @db.Decimal(10, 2)
+  totalBalance    Decimal?  @db.Decimal(12, 2)
+  interestRate    Decimal?  @db.Decimal(5, 2)
+  debitOrderDate  Int
+  isUncompromised Boolean   @default(true)
+  isActive        Boolean   @default(true)
+  notes           String?
+  personId        String?   // Optional: linked to person
+  person          Person?   @relation(fields: [personId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  payments        Payment[]
+
+  @@index([userId])
+  @@index([category])
+  @@index([personId])
+}
+
+// Payment - records of obligation payments with adjustment tracking
+model Payment {
+  id               String     @id @default(cuid())
+  userId           String
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  obligationId     String
+  obligation       Obligation @relation(fields: [obligationId], references: [id], onDelete: Cascade)
+  amount           Decimal    @db.Decimal(10, 2)
+  expectedAmount   Decimal?   @db.Decimal(10, 2)  // What it should have been
+  adjustmentReason String?    // DISCOUNT, INCREASE, DECREASE, PARTIAL, ERROR
+  paidAt           DateTime
+  month            String
+  notes            String?
+  createdAt        DateTime   @default(now())
+
+  @@index([userId])
+  @@index([obligationId])
+  @@index([month])
+}
+
+// Expense - one-time variable spending (not recurring)
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String   // "Fuel", "Groceries", "Bread", etc.
+  amount      Decimal  @db.Decimal(10, 2)
+  category    Category
+  date        DateTime // When the expense happened
+  personId    String?  // Optional: linked to person
+  person      Person?  @relation(fields: [personId], references: [id])
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([category])
+  @@index([date])
+  @@index([personId])
+}
+
+// Income - extra income beyond salary
+model Income {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String       // "Freelance project", "Sold TV", etc.
+  amount      Decimal      @db.Decimal(10, 2)
+  source      IncomeSource
+  date        DateTime
+  isRecurring Boolean      @default(false) // For regular side gigs
+  notes       String?
+  createdAt   DateTime     @default(now())
+
+  @@index([userId])
+  @@index([source])
+  @@index([date])
+}
+
+model Receipt {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageUrl      String
+  vendor        String?
+  amount        Decimal?  @db.Decimal(10, 2)
+  category      Category?
+  date          DateTime?
+  description   String?
+  rawAiResponse Json?
+  isProcessed   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([category])
+}
+
+model MonthlySnapshot {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month              String
+  totalIncome        Decimal  @db.Decimal(12, 2)
+  totalUncompromised Decimal  @db.Decimal(12, 2)
+  totalVariable      Decimal  @db.Decimal(12, 2)
+  totalSavings       Decimal  @db.Decimal(12, 2)
+  freeCashFlow       Decimal  @db.Decimal(12, 2)
+  createdAt          DateTime @default(now())
+
+  @@unique([userId, month])
+  @@index([userId])
+}
+
+model Settings {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  monthlyIncome Decimal  @db.Decimal(12, 2) @default(0)
+  monthlyBudget Decimal? @db.Decimal(12, 2) // Global monthly expense budget
+  payday        Int      @default(25)
+  currency      String   @default("ZAR")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

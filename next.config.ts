@@ -10,7 +10,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // PWA plugin requires webpack (using --webpack flag in build command)
 };
 
 export default withPWA(nextConfig);

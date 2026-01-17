@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { Sparkles, RefreshCw, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 interface SpendingInsight {
     summary: string;
@@ -91,11 +91,9 @@ export function AiInsights() {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="card p-6"
+        <GlassCard
+            className="p-6"
+            delay={0.5}
         >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
@@ -178,6 +176,6 @@ export function AiInsights() {
                     {error || 'No insights available'}
                 </p>
             )}
-        </motion.div>
+        </GlassCard>
     );
 }

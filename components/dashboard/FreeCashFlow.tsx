@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Obligation, Expense, Income } from '@/types/finance';
 import { formatCurrency, calculateBurnRate, calculateVariableCosts } from '@/lib/calculations';
 import Link from 'next/link';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 interface FreeCashFlowProps {
     monthlyIncome: number;
@@ -59,11 +60,9 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
         : '0';
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className={`card overflow-hidden ${className}`}
+        <GlassCard
+            className={`p-0 ${className}`}
+            delay={0.15}
         >
             {/* Gradient header */}
             <div className={`p-5 ${isPositive ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/10' : 'bg-gradient-to-br from-red-500/20 to-orange-500/10'}`}>
@@ -174,6 +173,6 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                     </Link>
                 </div>
             )}
-        </motion.div>
+        </GlassCard>
     );
 }

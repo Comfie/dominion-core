@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -23,6 +23,7 @@ import { AddIncomeModal } from '@/components/modals/AddIncomeModal';
 import { Obligation, Payment, Settings as SettingsType, Expense, Income, Person } from '@/types/finance';
 import { getDiscountStatus, getUpcomingPayments } from '@/lib/calculations';
 import { format } from 'date-fns';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -39,6 +40,7 @@ export default function Dashboard() {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [editingObligation, setEditingObligation] = useState<Obligation | null>(null);
   const [paymentObligation, setPaymentObligation] = useState<Obligation | null>(null);
   const [scannedExpenseData, setScannedExpenseData] = useState<{
@@ -172,118 +174,122 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="min-h-screen bg-[var(--dc-bg-primary)] pb-safe-area-bottom">
-        {/* Header */}
-        <header className="sticky top-0 z-50 glass">
-          <div className="px-4 py-4 flex items-center justify-between">
+      <div className="min-h-screen pb-safe-area-bottom">
+        {/* Header - Mobile App Style */}
+        <header className="sticky top-0 z-40 bg-[var(--dc-bg-primary)]/80 backdrop-blur-md border-b border-[var(--dc-border)]">
+          <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button className="w-10 h-10 rounded-xl bg-[var(--dc-bg-card)] flex items-center justify-center">
-                <Menu className="w-5 h-5 text-[var(--dc-text-secondary)]" />
-              </button>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--dc-primary)] to-[var(--dc-primary-soft)] flex items-center justify-center shadow-glow">
+                <span className="text-white font-bold text-lg">D</span>
+              </div>
               <div>
                 <motion.h1
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-lg font-bold gradient-text"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-lg font-bold text-[var(--dc-text-primary)]"
                 >
-                  Dominion Core
+                  Dashboard
                 </motion.h1>
                 <p className="text-xs text-[var(--dc-text-muted)]">
-                  {format(new Date(), 'EEEE, d MMMM yyyy')}
+                  {format(new Date(), 'MMMM d, yyyy')}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="w-10 h-10 rounded-xl bg-[var(--dc-bg-card)] flex items-center justify-center relative">
+              <button className="w-10 h-10 rounded-full bg-[var(--dc-bg-elevated)] flex items-center justify-center relative hover:bg-[var(--dc-bg-secondary)] transition-colors">
                 <Bell className="w-5 h-5 text-[var(--dc-text-secondary)]" />
                 {upcomingPayments.filter(p => !p.isPaid && p.daysUntil <= 3).length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
-                    {upcomingPayments.filter(p => !p.isPaid && p.daysUntil <= 3).length}
+                  <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[var(--dc-danger)] border border-[var(--dc-bg-elevated)] shadow-sm">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--dc-danger)] opacity-75"></span>
                   </span>
                 )}
               </button>
 
-              {/* User menu */}
-              <div className="relative group">
-                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--dc-primary)] to-purple-600 flex items-center justify-center">
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="w-10 h-10 rounded-full overflow-hidden border border-[var(--dc-border)] hover:border-[var(--dc-primary)] transition-colors"
+                >
                   {session?.user?.image ? (
                     <img
                       src={session.user.image}
                       alt=""
-                      className="w-full h-full rounded-xl object-cover"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-5 h-5 text-white" />
+                    <div className="w-full h-full bg-[var(--dc-bg-elevated)] flex items-center justify-center">
+                      <User className="w-5 h-5 text-[var(--dc-text-secondary)]" />
+                    </div>
                   )}
                 </button>
 
-                {/* Dropdown */}
-                <div className="absolute right-0 top-12 w-48 py-2 rounded-xl bg-[var(--dc-bg-card)] border border-[var(--dc-border)] shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <div className="px-4 py-2 border-b border-[var(--dc-border)]">
-                    <p className="text-sm font-medium text-[var(--dc-text-primary)] truncate">
-                      {session?.user?.name || 'User'}
-                    </p>
-                    <p className="text-xs text-[var(--dc-text-muted)] truncate">
-                      {session?.user?.email}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => router.push('/settings')}
-                    className="w-full px-4 py-2 flex items-center gap-2 text-sm text-[var(--dc-text-secondary)] hover:bg-[var(--dc-bg-secondary)] transition-colors"
-                  >
-                    <SettingsIcon className="w-4 h-4" />
-                    Settings
-                  </button>
-                  <button
-                    onClick={() => router.push('/api/auth/signout')}
-                    className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-400 hover:bg-[var(--dc-bg-secondary)] transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign out
-                  </button>
-                </div>
+                {/* Profile Dropdown */}
+                {isProfileOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsProfileOpen(false)}
+                    />
+                    <div className="absolute right-0 top-12 z-50 w-48 rounded-xl bg-[var(--dc-bg-card)] border border-[var(--dc-border)] shadow-xl overflow-hidden glass">
+                      <div className="px-4 py-3 border-b border-[var(--dc-border)]">
+                        <p className="text-sm font-medium text-[var(--dc-text-primary)] truncate">
+                          {session?.user?.name || 'User'}
+                        </p>
+                        <p className="text-xs text-[var(--dc-text-muted)] truncate">
+                          {session?.user?.email}
+                        </p>
+                      </div>
+                      <div className="p-1">
+                        <button
+                          onClick={() => router.push('/settings')}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--dc-text-secondary)] hover:text-[var(--dc-text-primary)] hover:bg-[var(--dc-bg-elevated)] rounded-lg transition-colors"
+                        >
+                          <SettingsIcon className="w-4 h-4" />
+                          Settings
+                        </button>
+                        <button
+                          onClick={() => signOut()}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Log Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </header>
 
-        {/* Welcome message */}
-        <div className="px-4 py-2">
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-sm text-[var(--dc-text-secondary)]"
-          >
-            Welcome back, <span className="text-[var(--dc-text-primary)] font-medium">{session?.user?.name?.split(' ')[0] || 'there'}</span>
-          </motion.p>
-        </div>
-
         {/* Main content */}
-        <main className="px-4 py-2 space-y-4">
+        <main className="px-4 py-6 space-y-6">
           {!hasData ? (
             /* Empty state */
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="card p-8 text-center"
+            <GlassCard
+              className="p-8 text-center flex flex-col items-center justify-center min-h-[60vh]"
+              gradient
             >
-              <div className="w-16 h-16 rounded-full bg-[var(--dc-primary)]/20 flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-[var(--dc-primary)]" />
+              <div className="w-20 h-20 rounded-full bg-[var(--dc-primary)]/10 flex items-center justify-center mb-6 shadow-glow">
+                <Plus className="w-10 h-10 text-[var(--dc-primary)]" />
               </div>
-              <h2 className="text-xl font-bold text-[var(--dc-text-primary)] mb-2">
-                Get Started
+              <h2 className="text-2xl font-bold text-[var(--dc-text-primary)] mb-3">
+                Welcome to Dominion
               </h2>
-              <p className="text-[var(--dc-text-muted)] mb-6">
-                Add your first obligation to start tracking your finances
+              <p className="text-[var(--dc-text-muted)] mb-8 max-w-xs mx-auto leading-relaxed">
+                Take control of your finances. Start by adding your first obligation.
               </p>
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsAddModalOpen(true)}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--dc-primary)] to-purple-600 text-white font-semibold hover:opacity-90 transition-opacity"
+                className="px-8 py-4 rounded-full bg-gradient-to-r from-[var(--dc-primary)] to-[var(--dc-accent)] text-white font-semibold shadow-lg shadow-[var(--dc-primary)]/25 flex items-center gap-2"
               >
-                Add Obligation
-              </button>
-            </motion.div>
+                <Plus className="w-5 h-5" />
+                <span>Add Obligation</span>
+              </motion.button>
+            </GlassCard>
           ) : (
             <>
               {/* Budget Alerts */}
@@ -293,13 +299,8 @@ export default function Dashboard() {
                 settings={settings}
               />
 
-
-              {/* Discount Safety - Hidden for now, not relevant for all users */}
-              {/* {levyObligation && <DiscountSafety status={discountStatus} />} */}
-
-              {/* Two column grid on larger screens */}
+              {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Free Cash Flow */}
                 <FreeCashFlow
                   monthlyIncome={settings?.monthlyIncome || 0}
                   obligations={obligations}
@@ -307,7 +308,6 @@ export default function Dashboard() {
                   incomes={incomes}
                 />
 
-                {/* Burn Rate */}
                 <BurnRate
                   obligations={obligations}
                   onEditObligation={setEditingObligation}
@@ -333,56 +333,69 @@ export default function Dashboard() {
           )}
         </main>
 
-        {/* Expandable FAB Menu */}
-        <div className="fixed bottom-6 right-4 flex flex-col items-end gap-3">
-          {/* Sub-actions - shown when FAB is open */}
-          {isFabOpen && (
-            <>
-              <motion.button
-                initial={{ scale: 0, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0, opacity: 0, y: 20 }}
-                onClick={() => { setIsIncomeModalOpen(true); setIsFabOpen(false); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/50 text-green-400"
-              >
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-medium">Add Income</span>
-              </motion.button>
-              <motion.button
-                initial={{ scale: 0, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0, opacity: 0, y: 20 }}
-                transition={{ delay: 0.05 }}
-                onClick={() => { setIsExpenseModalOpen(true); setIsFabOpen(false); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/20 border border-orange-500/50 text-orange-400"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span className="text-sm font-medium">Add Expense</span>
-              </motion.button>
-              <motion.button
-                initial={{ scale: 0, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0, opacity: 0, y: 20 }}
-                transition={{ delay: 0.1 }}
-                onClick={() => { setIsAddModalOpen(true); setIsFabOpen(false); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/20 border border-purple-500/50 text-purple-400"
-              >
-                <CreditCard className="w-4 h-4" />
-                <span className="text-sm font-medium">Add Obligation</span>
-              </motion.button>
-              <motion.button
-                initial={{ scale: 0, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0, opacity: 0, y: 20 }}
-                transition={{ delay: 0.15 }}
-                onClick={() => { setIsScanModalOpen(true); setIsFabOpen(false); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 border border-blue-500/50 text-blue-400"
-              >
-                <Upload className="w-4 h-4" />
-                <span className="text-sm font-medium">Scan Receipt</span>
-              </motion.button>
-            </>
-          )}
+        {/* Expandable FAB Menu - Adjusted position for Bottom Nav */}
+        <div className="fixed bottom-24 right-4 z-40 flex flex-col items-end gap-3 pointer-events-none">
+          {/* Sub-actions */}
+          <div className="flex flex-col items-end gap-3 pointer-events-auto">
+            {isFabOpen && (
+              <>
+                <motion.button
+                  initial={{ scale: 0, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0, opacity: 0, y: 20 }}
+                  onClick={() => { setIsIncomeModalOpen(true); setIsFabOpen(false); }}
+                  className="flex items-center gap-3 pr-2 pl-4 py-2"
+                >
+                  <span className="text-sm font-medium bg-[var(--dc-bg-elevated)] px-3 py-1 rounded-lg text-[var(--dc-text-primary)] shadow-md">Add Income</span>
+                  <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg text-white">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  initial={{ scale: 0, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0, opacity: 0, y: 20 }}
+                  transition={{ delay: 0.05 }}
+                  onClick={() => { setIsExpenseModalOpen(true); setIsFabOpen(false); }}
+                  className="flex items-center gap-3 pr-2 pl-4 py-2"
+                >
+                  <span className="text-sm font-medium bg-[var(--dc-bg-elevated)] px-3 py-1 rounded-lg text-[var(--dc-text-primary)] shadow-md">Add Expense</span>
+                  <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center shadow-lg text-white">
+                    <ShoppingBag className="w-5 h-5" />
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  initial={{ scale: 0, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0, opacity: 0, y: 20 }}
+                  transition={{ delay: 0.1 }}
+                  onClick={() => { setIsAddModalOpen(true); setIsFabOpen(false); }}
+                  className="flex items-center gap-3 pr-2 pl-4 py-2"
+                >
+                  <span className="text-sm font-medium bg-[var(--dc-bg-elevated)] px-3 py-1 rounded-lg text-[var(--dc-text-primary)] shadow-md">Add Obligation</span>
+                  <div className="w-10 h-10 rounded-full bg-[var(--dc-primary)] flex items-center justify-center shadow-lg text-white">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  initial={{ scale: 0, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0, opacity: 0, y: 20 }}
+                  transition={{ delay: 0.15 }}
+                  onClick={() => { setIsScanModalOpen(true); setIsFabOpen(false); }}
+                  className="flex items-center gap-3 pr-2 pl-4 py-2"
+                >
+                  <span className="text-sm font-medium bg-[var(--dc-bg-elevated)] px-3 py-1 rounded-lg text-[var(--dc-text-primary)] shadow-md">Scan Receipt</span>
+                  <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center shadow-lg text-white">
+                    <Upload className="w-5 h-5" />
+                  </div>
+                </motion.button>
+              </>
+            )}
+          </div>
 
           {/* Main FAB Button */}
           <motion.button
@@ -390,9 +403,9 @@ export default function Dashboard() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.8, type: 'spring' }}
             onClick={() => setIsFabOpen(!isFabOpen)}
-            className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${isFabOpen
+            className={`w-14 h-14 rounded-full shadow-lg shadow-[var(--dc-primary)]/30 flex items-center justify-center transition-all duration-300 pointer-events-auto ${isFabOpen
               ? 'bg-[var(--dc-bg-card)] border border-[var(--dc-border)]'
-              : 'bg-gradient-to-br from-[var(--dc-primary)] to-purple-600 shadow-purple-500/30'
+              : 'bg-gradient-to-br from-[var(--dc-primary)] to-[var(--dc-accent)]'
               }`}
           >
             {isFabOpen ? (

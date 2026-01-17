@@ -1,12 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 const inter = Inter({
   subsets: ["latin"],
   display: 'swap',
   variable: '--font-inter',
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-outfit',
 });
 
 export const metadata: Metadata = {
@@ -36,10 +43,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} antialiased min-h-screen bg-[var(--dc-bg-primary)]`}>
+      <body className={`${inter.variable} ${outfit.variable} antialiased min-h-screen bg-[var(--dc-bg-primary)]`}>
         <Providers>
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen pb-24 md:pb-0">
             {children}
+            <BottomNav />
           </div>
         </Providers>
       </body>

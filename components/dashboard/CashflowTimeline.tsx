@@ -6,6 +6,7 @@ import { UpcomingPayment, categoryConfig, Expense } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
 import { format, isToday, isTomorrow, compareAsc } from 'date-fns';
 import Link from 'next/link';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 interface TimelineItem {
     type: 'payment' | 'expense';
@@ -56,11 +57,9 @@ export function CashflowTimeline({ upcomingPayments, expenses = [], payday, clas
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className={`card p-5 ${className}`}
+        <GlassCard
+            className={`p-5 ${className}`}
+            delay={0.3}
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
@@ -235,6 +234,6 @@ export function CashflowTimeline({ upcomingPayments, expenses = [], payday, clas
                     View All Expenses →
                 </Link>
             )}
-        </motion.div>
+        </GlassCard>
     );
 }

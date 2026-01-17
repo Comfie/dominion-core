@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingDown, ChevronDown, ChevronUp, Edit2, CheckCircle } from 'lucide-react';
 import { Obligation, categoryConfig } from '@/types/finance';
 import Link from 'next/link';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 interface BurnRateProps {
     obligations: Obligation[];
@@ -19,11 +20,9 @@ export function BurnRate({ obligations, onEditObligation, onRecordPayment }: Bur
     const totalBurnRate = uncompromisedObligations.reduce((sum, o) => sum + o.amount, 0);
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="card p-6"
+        <GlassCard
+            className="p-6"
+            delay={0.3}
         >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
@@ -136,7 +135,7 @@ export function BurnRate({ obligations, onEditObligation, onRecordPayment }: Bur
             >
                 Manage All Obligations →
             </Link>
-        </motion.div>
+        </GlassCard>
     );
 }
 

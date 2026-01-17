@@ -26,13 +26,16 @@ export default function LoginPage() {
                 password,
             });
 
-            if (result?.error) {
-                // Map technical errors to user-friendly messages
+            // Check ok first - if login succeeded, redirect regardless of error field
+            if (result?.ok) {
+                router.push('/');
+                router.refresh();
+            } else if (result?.error && result.error !== 'undefined') {
+                // Only show error if it's a real error message
                 const errorMessage = mapErrorMessage(result.error);
                 setError(errorMessage);
             } else {
-                router.push('/');
-                router.refresh();
+                setError('Login failed. Please try again.');
             }
         } catch {
             setError('Unable to connect. Please check your internet connection.');

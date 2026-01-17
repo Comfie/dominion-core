@@ -2,11 +2,14 @@
 
 :root {
   /* Dominion Core Premium Brand Colors */
-  --dc-primary: #8b5cf6; /* Violet */
+  --dc-primary: #8b5cf6;
+  /* Violet */
   --dc-primary-soft: #a78bfa;
-  --dc-secondary: #06b6d4; /* Cyan */
-  --dc-accent: #f472b6; /* Pink */
-  
+  --dc-secondary: #06b6d4;
+  /* Cyan */
+  --dc-accent: #f472b6;
+  /* Pink */
+
   /* Status Colors (Vibrant) */
   --dc-success: #34d399;
   --dc-warning: #fbbf24;
@@ -14,11 +17,15 @@
   --dc-info: #60a5fa;
 
   /* Dark Theme Palette (Deep & Rich) */
-  --dc-bg-body: #050507;     /* Deepest black/blue */
-  --dc-bg-primary: #0f1016;  /* Main background */
-  --dc-bg-card: #181823;     /* Card background */
-  --dc-bg-elevated: #232332; /* Popups/Modals */
-  
+  --dc-bg-body: #050507;
+  /* Deepest black/blue */
+  --dc-bg-primary: #0f1016;
+  /* Main background */
+  --dc-bg-card: #181823;
+  /* Card background */
+  --dc-bg-elevated: #232332;
+  /* Popups/Modals */
+
   /* Borders */
   --dc-border: rgba(255, 255, 255, 0.08);
   --dc-border-highlight: rgba(139, 92, 246, 0.3);
@@ -48,7 +55,8 @@
 body {
   background-color: var(--dc-bg-body);
   color: var(--dc-text-primary);
-  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif; /* Prioritize Outfit if available */
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  /* Prioritize Outfit if available */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -92,7 +100,8 @@ body {
 .card {
   background: var(--dc-bg-card);
   border: 1px solid var(--dc-border);
-  border-radius: 20px; /* More rounded */
+  border-radius: 20px;
+  /* More rounded */
   box-shadow: var(--dc-shadow-md);
   position: relative;
   overflow: hidden;
@@ -112,19 +121,40 @@ body {
 
 /* Pulse animation for status indicators */
 @keyframes pulse-success {
-  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
 }
 
 @keyframes pulse-danger {
-  0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(248, 113, 113, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+  }
 }
 
-.pulse-success { animation: pulse-success 2s infinite; }
-.pulse-danger { animation: pulse-danger 2s infinite; }
+.pulse-success {
+  animation: pulse-success 2s infinite;
+}
+
+.pulse-danger {
+  animation: pulse-danger 2s infinite;
+}
 
 /* Gradient text */
 .gradient-text {
@@ -136,8 +166,15 @@ body {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -147,10 +184,20 @@ body {
 /* Safe area padding for mobile */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-area-bottom {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 80px); /* +80px for bottom nav */
+    padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+    /* +80px for bottom nav */
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
   }
 }
 
 /* Utilities */
-.text-balance { text-wrap: balance; }
-.text-pretty { text-wrap: pretty; }
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}

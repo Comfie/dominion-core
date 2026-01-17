@@ -176,7 +176,7 @@ export default function Dashboard() {
     <>
       <div className="min-h-screen pb-safe-area-bottom">
         {/* Header - Mobile App Style */}
-        <header className="sticky top-0 z-40 bg-[var(--dc-bg-primary)]/80 backdrop-blur-md border-b border-[var(--dc-border)]">
+        <header className="sticky top-0 z-40 bg-[var(--dc-bg-primary)]/80 backdrop-blur-md border-b border-[var(--dc-border)] pt-safe">
           <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--dc-primary)] to-[var(--dc-primary-soft)] flex items-center justify-center shadow-glow">

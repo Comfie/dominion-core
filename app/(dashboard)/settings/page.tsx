@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2, Save, Plus, Trash2, Users, Pencil, Check, X, AlertTriangle, DollarSign, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Plus, Trash2, Users, Pencil, Check, X, AlertTriangle, DollarSign, ShieldAlert, Shield, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Person } from '@/types/finance';
 import { AnimatePresence } from 'framer-motion';
@@ -472,6 +472,33 @@ export default function SettingsPage() {
                             <p className="text-[var(--dc-text-primary)]">{session?.user?.email}</p>
                         </div>
                     </div>
+                </motion.div>
+
+                {/* Security & Privacy */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                >
+                    <Link
+                        href="/security"
+                        className="card p-4 flex items-center justify-between hover:border-[var(--dc-primary)] transition-colors block"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                <Shield className="w-5 h-5 text-green-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-[var(--dc-text-primary)]">
+                                    Security & Privacy
+                                </h3>
+                                <p className="text-sm text-[var(--dc-text-muted)]">
+                                    Learn how we protect your data
+                                </p>
+                            </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-[var(--dc-text-muted)]" />
+                    </Link>
                 </motion.div>
 
                 {/* Danger Zone - Reset Account */}

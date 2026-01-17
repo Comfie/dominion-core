@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
@@ -13,6 +13,7 @@
     "@ai-sdk/anthropic": "^3.0.15",
     "@anthropic-ai/sdk": "^0.71.2",
     "@auth/prisma-adapter": "^2.11.1",
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "ai": "^6.0.39",

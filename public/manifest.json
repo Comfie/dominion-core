@@ -1,11 +1,11 @@
 {
   "name": "Dominion Core",
-  "short_name": "DominionCore",
+  "short_name": "Dominion",
   "description": "Personal Finance Dashboard with AI-powered insights",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0f",
-  "theme_color": "#6366f1",
+  "background_color": "#050507",
+  "theme_color": "#050507",
   "orientation": "portrait-primary",
   "icons": [
     {

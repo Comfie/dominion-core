@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // POST /api/notifications/subscribe - Save push subscription
 export async function POST(request: Request) {
@@ -26,11 +27,11 @@ export async function POST(request: Request) {
     await prisma.settings.upsert({
       where: { userId: session.user.id },
       update: {
-        pushSubscription: subscription,
+        pushSubscription: subscription ?? Prisma.DbNull,
       },
       create: {
         userId: session.user.id,
-        pushSubscription: subscription,
+        pushSubscription: subscription ?? Prisma.DbNull,
       },
     });
 
@@ -56,7 +57,7 @@ export async function DELETE() {
     await prisma.settings.update({
       where: { userId: session.user.id },
       data: {
-        pushSubscription: null,
+        pushSubscription: Prisma.DbNull,
       },
     });
 

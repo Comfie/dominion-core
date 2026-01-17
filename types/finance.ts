@@ -25,6 +25,16 @@ export type IncomeSource =
   | 'REFUND'
   | 'OTHER';
 
+export type GoalCategory =
+  | 'EMERGENCY_FUND'
+  | 'HOLIDAY'
+  | 'CAR'
+  | 'HOME'
+  | 'EDUCATION'
+  | 'WEDDING'
+  | 'RETIREMENT'
+  | 'OTHER';
+
 export type AdjustmentReason =
   | 'DISCOUNT'
   | 'INCREASE'
@@ -107,6 +117,20 @@ export interface Receipt {
   createdAt: Date;
 }
 
+// Savings Goal - track progress towards financial goals
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate?: Date;
+  category: GoalCategory;
+  color: string;
+  isCompleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface MonthlySnapshot {
   id: string;
   month: string;
@@ -178,3 +202,16 @@ export const incomeSourceConfig: Record<IncomeSource, { label: string; color: st
   REFUND: { label: 'Refund', color: '#14b8a6', icon: '↩️' },
   OTHER: { label: 'Other', color: '#6b7280', icon: '💰' },
 };
+
+// Goal category configuration for UI
+export const goalCategoryConfig: Record<GoalCategory, { label: string; color: string; icon: string }> = {
+  EMERGENCY_FUND: { label: 'Emergency Fund', color: '#ef4444', icon: 'ShieldAlert' },
+  HOLIDAY: { label: 'Holiday', color: '#f59e0b', icon: 'Plane' },
+  CAR: { label: 'Car', color: '#3b82f6', icon: 'Car' },
+  HOME: { label: 'Home', color: '#6366f1', icon: 'Home' },
+  EDUCATION: { label: 'Education', color: '#8b5cf6', icon: 'GraduationCap' },
+  WEDDING: { label: 'Wedding', color: '#ec4899', icon: 'Heart' },
+  RETIREMENT: { label: 'Retirement', color: '#22c55e', icon: 'Palmtree' },
+  OTHER: { label: 'Other', color: '#6b7280', icon: 'Target' },
+};
+

@@ -89,10 +89,10 @@ export function AddObligationModal({ isOpen, onClose, onSuccess }: AddObligation
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="card p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+                            className="card w-full max-w-lg max-h-[90vh] flex flex-col"
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between p-6 pb-4 border-b border-[var(--dc-border)]">
                                 <h2 className="text-xl font-bold text-[var(--dc-text-primary)]">
                                     Add Obligation
                                 </h2>
@@ -105,7 +105,8 @@ export function AddObligationModal({ isOpen, onClose, onSuccess }: AddObligation
                             </div>
 
                             {/* Form */}
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                                <div className="flex-1 overflow-y-auto p-6 space-y-4">
                                 {/* Name */}
                                 <div>
                                     <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
@@ -255,9 +256,10 @@ export function AddObligationModal({ isOpen, onClose, onSuccess }: AddObligation
                                         {error}
                                     </div>
                                 )}
+                                </div>
 
-                                {/* Actions */}
-                                <div className="flex gap-3 pt-2">
+                                {/* Actions - Fixed at bottom */}
+                                <div className="flex gap-3 p-6 pt-4 border-t border-[var(--dc-border)]">
                                     <button
                                         type="button"
                                         onClick={onClose}

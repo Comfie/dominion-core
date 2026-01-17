@@ -4,11 +4,12 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, Trash2, Pencil, Check, X, Filter, Calendar, Users, ShoppingBag, Loader2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Pencil, Check, X, Filter, Calendar, Users, ShoppingBag, Loader2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Expense, Person, categoryConfig, Category } from '@/types/finance';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths } from 'date-fns';
 import { AddExpenseModal } from '@/components/modals/AddExpenseModal';
+import { BankStatementImport } from '@/components/modals/BankStatementImport';
 
 export default function ExpensesPage() {
     const { data: session, status } = useSession();
@@ -21,8 +22,10 @@ export default function ExpensesPage() {
     const [filterPerson, setFilterPerson] = useState<string>('');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingName, setEditingName] = useState('');
+    const [editingCategory, setEditingCategory] = useState<string>('');
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -78,13 +81,30 @@ export default function ExpensesPage() {
             await fetch(`/api/expenses/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: editingName.trim() }),
+                body: JSON.stringify({
+                    name: editingName.trim(),
+                    category: editingCategory,
+                }),
             });
             setEditingId(null);
             setEditingName('');
+            setEditingCategory('');
             fetchData();
         } catch (error) {
             console.error('Error updating expense:', error);
+        }
+    };
+
+    const handleQuickCategoryChange = async (id: string, category: string) => {
+        try {
+            await fetch(`/api/expenses/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category }),
+            });
+            fetchData();
+        } catch (error) {
+            console.error('Error updating expense category:', error);
         }
     };
 
@@ -129,12 +149,21 @@ export default function ExpensesPage() {
                             Track your spending
                         </p>
                     </div>
-                    <button
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="w-10 h-10 rounded-xl bg-[var(--dc-primary)] flex items-center justify-center"
-                    >
-                        <Plus className="w-5 h-5 text-white" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsImportModalOpen(true)}
+                            className="w-10 h-10 rounded-xl bg-[var(--dc-bg-card)] border border-[var(--dc-border)] flex items-center justify-center hover:border-[var(--dc-primary)] transition-colors"
+                            title="Import bank statement"
+                        >
+                            <Upload className="w-5 h-5 text-[var(--dc-text-secondary)]" />
+                        </button>
+                        <button
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="w-10 h-10 rounded-xl bg-[var(--dc-primary)] flex items-center justify-center"
+                        >
+                            <Plus className="w-5 h-5 text-white" />
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -269,26 +298,37 @@ export default function ExpensesPage() {
 
                                         <div className="flex-1 min-w-0">
                                             {editingId === expense.id ? (
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        type="text"
-                                                        value={editingName}
-                                                        onChange={(e) => setEditingName(e.target.value)}
-                                                        className="flex-1 bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-lg py-1 px-2 text-sm text-[var(--dc-text-primary)]"
-                                                        autoFocus
-                                                    />
-                                                    <button
-                                                        onClick={() => handleEdit(expense.id)}
-                                                        className="p-1 text-green-400"
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={editingName}
+                                                            onChange={(e) => setEditingName(e.target.value)}
+                                                            className="flex-1 bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-lg py-1 px-2 text-sm text-[var(--dc-text-primary)]"
+                                                            autoFocus
+                                                        />
+                                                        <button
+                                                            onClick={() => handleEdit(expense.id)}
+                                                            className="p-1 text-green-400"
+                                                        >
+                                                            <Check className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => { setEditingId(null); setEditingCategory(''); }}
+                                                            className="p-1 text-[var(--dc-text-muted)]"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <select
+                                                        value={editingCategory}
+                                                        onChange={(e) => setEditingCategory(e.target.value)}
+                                                        className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-lg py-1 px-2 text-sm text-[var(--dc-text-primary)] focus:outline-none focus:border-[var(--dc-primary)]"
                                                     >
-                                                        <Check className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setEditingId(null)}
-                                                        className="p-1 text-[var(--dc-text-muted)]"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
+                                                        {Object.entries(categoryConfig).map(([key, cfg]) => (
+                                                            <option key={key} value={key}>{cfg.label}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                             ) : (
                                                 <>
@@ -298,7 +338,17 @@ export default function ExpensesPage() {
                                                     <div className="flex items-center gap-2 text-xs text-[var(--dc-text-muted)]">
                                                         <span>{format(expense.date, 'd MMM')}</span>
                                                         <span>•</span>
-                                                        <span>{config.label}</span>
+                                                        <select
+                                                            value={expense.category}
+                                                            onChange={(e) => handleQuickCategoryChange(expense.id, e.target.value)}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="bg-transparent text-[var(--dc-text-secondary)] cursor-pointer focus:outline-none hover:text-[var(--dc-primary)] transition-colors"
+                                                            style={{ color: config.color }}
+                                                        >
+                                                            {Object.entries(categoryConfig).map(([key, cfg]) => (
+                                                                <option key={key} value={key}>{cfg.label}</option>
+                                                            ))}
+                                                        </select>
                                                         {expense.person && (
                                                             <>
                                                                 <span>•</span>
@@ -320,6 +370,7 @@ export default function ExpensesPage() {
                                                         onClick={() => {
                                                             setEditingId(expense.id);
                                                             setEditingName(expense.name);
+                                                            setEditingCategory(expense.category);
                                                         }}
                                                         className="p-1.5 rounded-lg hover:bg-[var(--dc-bg-secondary)] text-[var(--dc-text-muted)]"
                                                     >
@@ -408,6 +459,14 @@ export default function ExpensesPage() {
                 onClose={() => setIsAddModalOpen(false)}
                 onSuccess={fetchData}
             />
+
+            {/* Bank Statement Import Modal */}
+            {isImportModalOpen && (
+                <BankStatementImport
+                    onSuccess={fetchData}
+                    onClose={() => setIsImportModalOpen(false)}
+                />
+            )}
         </div>
     );
 }

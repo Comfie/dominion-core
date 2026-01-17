@@ -115,10 +115,10 @@ export function RecordPaymentModal({ isOpen, onClose, onSuccess, obligation }: R
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="card p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+                            className="card w-full max-w-md max-h-[90vh] flex flex-col"
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between p-6 pb-4 border-b border-[var(--dc-border)]">
                                 <h2 className="text-xl font-bold text-[var(--dc-text-primary)]">
                                     Record Payment
                                 </h2>
@@ -130,29 +130,29 @@ export function RecordPaymentModal({ isOpen, onClose, onSuccess, obligation }: R
                                 </button>
                             </div>
 
-                            {/* Obligation Info */}
-                            <div className="mb-6 p-4 rounded-xl bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)]">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <p className="text-sm text-[var(--dc-text-muted)] mb-1">Obligation</p>
-                                        <p className="text-lg font-semibold text-[var(--dc-text-primary)]">
-                                            {obligation.name}
-                                        </p>
-                                        <p className="text-sm text-[var(--dc-text-secondary)]">
-                                            {obligation.provider}
-                                        </p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-[var(--dc-text-muted)]">Expected</p>
-                                        <p className="text-lg font-bold text-[var(--dc-text-primary)]">
-                                            R {obligation.amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
                             {/* Form */}
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                                    {/* Obligation Info */}
+                                    <div className="p-4 rounded-xl bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)]">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="text-sm text-[var(--dc-text-muted)] mb-1">Obligation</p>
+                                                <p className="text-lg font-semibold text-[var(--dc-text-primary)]">
+                                                    {obligation.name}
+                                                </p>
+                                                <p className="text-sm text-[var(--dc-text-secondary)]">
+                                                    {obligation.provider}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-[var(--dc-text-muted)]">Expected</p>
+                                                <p className="text-lg font-bold text-[var(--dc-text-primary)]">
+                                                    R {obligation.amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 {/* Amount - readonly if no adjustment */}
                                 <div>
                                     <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
@@ -266,9 +266,10 @@ export function RecordPaymentModal({ isOpen, onClose, onSuccess, obligation }: R
                                         {error}
                                     </div>
                                 )}
+                                </div>
 
-                                {/* Actions */}
-                                <div className="flex gap-3 pt-2">
+                                {/* Actions - Fixed at bottom */}
+                                <div className="flex gap-3 p-6 pt-4 border-t border-[var(--dc-border)]">
                                     <button
                                         type="button"
                                         onClick={onClose}

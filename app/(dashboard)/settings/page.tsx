@@ -8,6 +8,8 @@ import { ArrowLeft, Loader2, Save, Plus, Trash2, Users, Pencil, Check, X, AlertT
 import Link from 'next/link';
 import { Person } from '@/types/finance';
 import { AnimatePresence } from 'framer-motion';
+import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { CategorySettings } from '@/components/settings/CategorySettings';
 
 export default function SettingsPage() {
     const { data: session, status } = useSession();
@@ -472,6 +474,24 @@ export default function SettingsPage() {
                             <p className="text-[var(--dc-text-primary)]">{session?.user?.email}</p>
                         </div>
                     </div>
+                </motion.div>
+
+                {/* Category Keywords */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <CategorySettings />
+                </motion.div>
+
+                {/* Notifications */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                >
+                    <NotificationSettings />
                 </motion.div>
 
                 {/* Security & Privacy */}

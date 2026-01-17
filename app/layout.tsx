@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,7 +46,8 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${outfit.variable} antialiased min-h-screen bg-[var(--dc-bg-primary)]`}>
         <Providers>
-          <div className="flex flex-col min-h-screen pb-24 md:pb-0">
+          <DesktopSidebar />
+          <div className="flex flex-col min-h-screen pb-24 md:pb-0 md:ml-64">
             {children}
             <BottomNav />
           </div>
@@ -54,3 +56,4 @@ export default function RootLayout({
     </html>
   );
 }
+

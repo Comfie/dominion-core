@@ -161,15 +161,23 @@ model Session {
 }
 
 model Settings {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  monthlyIncome Decimal  @default(0) @db.Decimal(12, 2)
-  payday        Int      @default(25)
-  currency      String   @default("ZAR")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  monthlyBudget Decimal? @db.Decimal(12, 2)
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  monthlyIncome         Decimal  @default(0) @db.Decimal(12, 2)
+  payday                Int      @default(25)
+  currency              String   @default("ZAR")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  monthlyBudget         Decimal? @db.Decimal(12, 2)
+  // Notification preferences
+  notifyBudgetAlerts    Boolean  @default(true)
+  notifyUpcomingBills   Boolean  @default(true)
+  notifyPayday          Boolean  @default(true)
+  notifyGoalProgress    Boolean  @default(true)
+  pushSubscription      Json?
+  // Custom category keywords for auto-categorization
+  categoryKeywords      Json?
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -191,6 +199,24 @@ model User {
   receipts        Receipt[]
   sessions        Session[]
   settings        Settings?
+  savingsGoals    SavingsGoal[]
+}
+
+model SavingsGoal {
+  id            String       @id @default(cuid())
+  userId        String
+  name          String
+  targetAmount  Decimal      @db.Decimal(12, 2)
+  currentAmount Decimal      @default(0) @db.Decimal(12, 2)
+  targetDate    DateTime?
+  category      GoalCategory @default(OTHER)
+  color         String       @default("#8B5CF6")
+  isCompleted   Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -216,6 +242,17 @@ enum Category {
   SHOPPING
 }
 
+enum GoalCategory {
+  EMERGENCY_FUND
+  HOLIDAY
+  CAR
+  HOME
+  EDUCATION
+  WEDDING
+  RETIREMENT
+  OTHER
+}
+
 enum IncomeSource {
   SALARY
   FREELANCE
@@ -227,3 +264,4 @@ enum IncomeSource {
   REFUND
   OTHER
 }
+

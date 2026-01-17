@@ -11,7 +11,8 @@ import {
   DebtProgress,
   CashflowTimeline,
   FreeCashFlow,
-  AiInsights
+  AiInsights,
+  QuickAccess
 } from '@/components/dashboard';
 import { BudgetAlerts } from '@/components/dashboard/BudgetAlerts';
 import { AddObligationModal } from '@/components/modals/AddObligationModal';
@@ -298,6 +299,9 @@ export default function Dashboard() {
                 persons={persons}
                 settings={settings}
               />
+
+              {/* Quick Access - Goals & Insights */}
+              <QuickAccess />
 
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

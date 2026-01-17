@@ -102,7 +102,7 @@ export function AiInsights() {
                         <Sparkles className="w-6 h-6 text-purple-400" />
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-[var(--dc-text-primary)]">AI Insights</p>
+                        <p className="text-sm font-medium text-[var(--dc-text-primary)]">AI Monthly Insights</p>
                         <p className="text-xs text-[var(--dc-text-muted)]">Powered by Claude</p>
                     </div>
                 </div>

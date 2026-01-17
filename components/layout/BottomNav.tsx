@@ -3,11 +3,11 @@
 import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, CreditCard, TrendingUp, ShoppingBag, Settings } from 'lucide-react';
+import { Home, Target, TrendingUp, ShoppingBag, Settings } from 'lucide-react';
 
 const navItems = [
     { icon: Home, label: 'Home', path: '/' },
-    { icon: CreditCard, label: 'Obligations', path: '/obligations' },
+    { icon: Target, label: 'Goals', path: '/goals' },
     { icon: ShoppingBag, label: 'Expenses', path: '/expenses' },
     { icon: TrendingUp, label: 'Income', path: '/income' },
     { icon: Settings, label: 'Settings', path: '/settings' },

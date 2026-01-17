@@ -1,28 +1,64 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, TrendingUp } from 'lucide-react';
-import { IncomeSource, incomeSourceConfig } from '@/types/finance';
-import { format } from 'date-fns';
+import { X, Loader2, Target } from 'lucide-react';
+import { GoalCategory, goalCategoryConfig, SavingsGoal } from '@/types/finance';
+import { format, addMonths } from 'date-fns';
 
-interface AddIncomeModalProps {
+interface SavingsGoalModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    editGoal?: SavingsGoal | null;
 }
 
-export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalProps) {
+const colorOptions = [
+    '#8B5CF6', // Purple (default)
+    '#ef4444', // Red
+    '#f59e0b', // Amber
+    '#22c55e', // Green
+    '#3b82f6', // Blue
+    '#ec4899', // Pink
+    '#14b8a6', // Teal
+    '#6366f1', // Indigo
+];
+
+export function SavingsGoalModal({ isOpen, onClose, onSuccess, editGoal }: SavingsGoalModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         name: '',
-        amount: '',
-        source: 'SIDE_HUSTLE' as IncomeSource,
-        date: format(new Date(), 'yyyy-MM-dd'),
-        isRecurring: false,
-        notes: '',
+        targetAmount: '',
+        currentAmount: '',
+        targetDate: format(addMonths(new Date(), 12), 'yyyy-MM-dd'),
+        category: 'OTHER' as GoalCategory,
+        color: '#8B5CF6',
     });
+
+    // Pre-fill form when editing
+    useEffect(() => {
+        if (isOpen && editGoal) {
+            setFormData({
+                name: editGoal.name,
+                targetAmount: editGoal.targetAmount.toString(),
+                currentAmount: editGoal.currentAmount.toString(),
+                targetDate: editGoal.targetDate ? format(new Date(editGoal.targetDate), 'yyyy-MM-dd') : '',
+                category: editGoal.category,
+                color: editGoal.color,
+            });
+        } else if (isOpen && !editGoal) {
+            // Reset form for new goal
+            setFormData({
+                name: '',
+                targetAmount: '',
+                currentAmount: '',
+                targetDate: format(addMonths(new Date(), 12), 'yyyy-MM-dd'),
+                category: 'OTHER',
+                color: '#8B5CF6',
+            });
+        }
+    }, [isOpen, editGoal]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,29 +66,25 @@ export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalPro
         setIsLoading(true);
 
         try {
-            const res = await fetch('/api/incomes', {
-                method: 'POST',
+            const url = editGoal ? `/api/goals/${editGoal.id}` : '/api/goals';
+            const method = editGoal ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
-                    amount: parseFloat(formData.amount),
+                    targetAmount: parseFloat(formData.targetAmount),
+                    currentAmount: parseFloat(formData.currentAmount) || 0,
+                    targetDate: formData.targetDate || null,
                 }),
             });
 
             if (!res.ok) {
                 const data = await res.json();
-                throw new Error(data.error || 'Failed to add income');
+                throw new Error(data.error || 'Failed to save goal');
             }
 
-            // Reset form and close
-            setFormData({
-                name: '',
-                amount: '',
-                source: 'SIDE_HUSTLE',
-                date: format(new Date(), 'yyyy-MM-dd'),
-                isRecurring: false,
-                notes: '',
-            });
             onSuccess();
             onClose();
         } catch (err: any) {
@@ -86,11 +118,11 @@ export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalPro
                             {/* Header */}
                             <div className="flex items-center justify-between p-6 pb-4 border-b border-[var(--dc-border)]">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                        <TrendingUp className="w-5 h-5 text-green-400" />
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                                        <Target className="w-5 h-5 text-emerald-400" />
                                     </div>
                                     <h2 className="text-xl font-bold text-[var(--dc-text-primary)]">
-                                        Add Income
+                                        {editGoal ? 'Edit Goal' : 'New Savings Goal'}
                                     </h2>
                                 </div>
                                 <button
@@ -107,30 +139,30 @@ export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalPro
                                 {/* Name */}
                                 <div>
                                     <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
-                                        Income Description *
+                                        Goal Name *
                                     </label>
                                     <input
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="e.g. Freelance project, Sold TV"
+                                        placeholder="e.g. Holiday Fund, Emergency Fund"
                                         className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] placeholder:text-[var(--dc-text-muted)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors"
                                         required
                                     />
                                 </div>
 
-                                {/* Amount & Source */}
+                                {/* Target Amount & Category */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
-                                            Amount *
+                                            Target Amount *
                                         </label>
                                         <input
                                             type="number"
                                             step="0.01"
-                                            value={formData.amount}
-                                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                            placeholder="0.00"
+                                            value={formData.targetAmount}
+                                            onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+                                            placeholder="15000"
                                             className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] placeholder:text-[var(--dc-text-muted)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors"
                                             required
                                         />
@@ -138,14 +170,14 @@ export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalPro
 
                                     <div>
                                         <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
-                                            Source *
+                                            Category
                                         </label>
                                         <select
-                                            value={formData.source}
-                                            onChange={(e) => setFormData({ ...formData, source: e.target.value as IncomeSource })}
+                                            value={formData.category}
+                                            onChange={(e) => setFormData({ ...formData, category: e.target.value as GoalCategory })}
                                             className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors"
                                         >
-                                            {Object.entries(incomeSourceConfig).map(([key, config]) => (
+                                            {Object.entries(goalCategoryConfig).map(([key, config]) => (
                                                 <option key={key} value={key}>
                                                     {config.label}
                                                 </option>
@@ -154,46 +186,54 @@ export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalPro
                                     </div>
                                 </div>
 
-                                {/* Date */}
-                                <div>
-                                    <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
-                                        Date Received *
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={formData.date}
-                                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                        className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors"
-                                        required
-                                    />
+                                {/* Current Amount & Target Date */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
+                                            Already Saved
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={formData.currentAmount}
+                                            onChange={(e) => setFormData({ ...formData, currentAmount: e.target.value })}
+                                            placeholder="0"
+                                            className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] placeholder:text-[var(--dc-text-muted)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
+                                            Target Date
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={formData.targetDate}
+                                            onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
+                                            className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors"
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Is Recurring */}
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="isRecurring"
-                                        checked={formData.isRecurring}
-                                        onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                                        className="w-5 h-5 rounded bg-[var(--dc-bg-secondary)] border-[var(--dc-border)] text-[var(--dc-primary)] focus:ring-2 focus:ring-[var(--dc-primary)]"
-                                    />
-                                    <label htmlFor="isRecurring" className="text-sm text-[var(--dc-text-secondary)]">
-                                        This is a recurring income (e.g. monthly side gig)
-                                    </label>
-                                </div>
-
-                                {/* Notes */}
+                                {/* Color Picker */}
                                 <div>
                                     <label className="block text-sm text-[var(--dc-text-secondary)] mb-2">
-                                        Notes (Optional)
+                                        Color
                                     </label>
-                                    <textarea
-                                        value={formData.notes}
-                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                        placeholder="Any additional details..."
-                                        rows={2}
-                                        className="w-full bg-[var(--dc-bg-secondary)] border border-[var(--dc-border)] rounded-xl py-3 px-4 text-[var(--dc-text-primary)] placeholder:text-[var(--dc-text-muted)] focus:outline-none focus:border-[var(--dc-primary)] transition-colors resize-none"
-                                    />
+                                    <div className="flex gap-2 flex-wrap">
+                                        {colorOptions.map((color) => (
+                                            <button
+                                                key={color}
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, color })}
+                                                className={`w-8 h-8 rounded-full transition-all ${formData.color === color
+                                                        ? 'ring-2 ring-offset-2 ring-offset-[var(--dc-bg-primary)] ring-white scale-110'
+                                                        : 'hover:scale-105'
+                                                    }`}
+                                                style={{ backgroundColor: color }}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Error */}
@@ -216,12 +256,12 @@ export function AddIncomeModal({ isOpen, onClose, onSuccess }: AddIncomeModalPro
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {isLoading ? (
                                             <Loader2 className="w-5 h-5 animate-spin" />
                                         ) : (
-                                            'Add Income'
+                                            editGoal ? 'Save Changes' : 'Create Goal'
                                         )}
                                     </button>
                                 </div>

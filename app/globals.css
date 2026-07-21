@@ -55,8 +55,7 @@
 body {
   background-color: var(--dc-bg-body);
   color: var(--dc-text-primary);
-  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-  /* Prioritize Outfit if available */
+  font-family: var(--font-outfit), var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

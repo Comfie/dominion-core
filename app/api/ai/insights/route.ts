@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { generateSpendingInsights } from '@/lib/claude';
 import prisma from '@/lib/prisma';
 import { format } from 'date-fns';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // GET /api/ai/insights - Get AI-generated spending insights
 export async function GET() {
@@ -12,6 +13,13 @@ export async function GET() {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!checkRateLimit(`insights:${session.user.id}`, 10, 24 * 60 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     const currentMonth = format(new Date(), 'yyyy-MM');

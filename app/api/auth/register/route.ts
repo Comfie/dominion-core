@@ -1,25 +1,31 @@
 import { NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { registerSchema } from '@/lib/validations';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
-    // Validation
-    if (!email || !password) {
+    if (!checkRateLimit(`register:${ip}`, 5, 15 * 60 * 1000)) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Too many attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
+    const body = await request.json();
+    const result = registerSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0].message },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
+    const { name, email, password } = result.data;
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({

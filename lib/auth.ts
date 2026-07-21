@@ -2,6 +2,10 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { isRateLimited, recordAttempt } from '@/lib/rateLimit';
+
+const LOGIN_ATTEMPT_LIMIT = 5;
+const LOGIN_ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,17 +21,25 @@ export const authOptions: NextAuthOptions = {
             throw new Error('Please enter your email and password');
           }
 
+          const rateLimitKey = `login:${credentials.email.toLowerCase()}`;
+
+          if (isRateLimited(rateLimitKey, LOGIN_ATTEMPT_LIMIT, LOGIN_ATTEMPT_WINDOW_MS)) {
+            throw new Error('Too many login attempts. Please try again later.');
+          }
+
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           });
 
           if (!user || !user.password) {
+            recordAttempt(rateLimitKey, LOGIN_ATTEMPT_WINDOW_MS);
             throw new Error('No user found with this email');
           }
 
           const isPasswordValid = await compare(credentials.password, user.password);
 
           if (!isPasswordValid) {
+            recordAttempt(rateLimitKey, LOGIN_ATTEMPT_WINDOW_MS);
             throw new Error('Invalid password');
           }
 

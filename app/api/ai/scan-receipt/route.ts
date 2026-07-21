@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { scanReceipt } from '@/lib/claude';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // POST /api/ai/scan-receipt - Scan a receipt image
 export async function POST(request: Request) {
@@ -10,6 +11,13 @@ export async function POST(request: Request) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!checkRateLimit(`scan-receipt:${session.user.id}`, 20, 24 * 60 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
     }
 
     const formData = await request.formData();

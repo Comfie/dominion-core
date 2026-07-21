@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { goalUpdateSchema } from '@/lib/validations';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -53,7 +54,16 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { name, targetAmount, currentAmount, targetDate, category, color, addFunds } = body;
+    const result = goalUpdateSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+
+    const { name, targetAmount, currentAmount, targetDate, category, color, addFunds } = result.data;
 
     // First verify ownership
     const existingGoal = await prisma.savingsGoal.findFirst({

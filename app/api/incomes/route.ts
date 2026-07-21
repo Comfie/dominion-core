@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { incomeSchema } from '@/lib/validations';
 
 // GET /api/incomes - Get all incomes for the current user
 export async function GET(request: Request) {
@@ -53,14 +54,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, amount, source, date, isRecurring, notes } = body;
+    const result = incomeSchema.safeParse(body);
 
-    if (!name || !amount || !source || !date) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Name, amount, source, and date are required' },
+        { error: result.error.issues[0].message },
         { status: 400 }
       );
     }
+
+    const { name, amount, source, date, isRecurring, notes } = result.data;
 
     const income = await prisma.income.create({
       data: {
@@ -69,8 +72,8 @@ export async function POST(request: Request) {
         amount,
         source,
         date: new Date(date),
-        isRecurring: isRecurring || false,
-        notes: notes || null,
+        isRecurring: isRecurring ?? false,
+        notes: notes ?? null,
       },
     });
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { obligationSchema } from '@/lib/validations';
 
 // GET /api/obligations - Get all obligations for the current user
 export async function GET() {
@@ -37,6 +38,15 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const result = obligationSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+
     const {
       name,
       provider,
@@ -46,16 +56,10 @@ export async function POST(request: Request) {
       interestRate,
       debitOrderDate,
       isUncompromised,
+      isActive,
+      personId,
       notes,
-    } = body;
-
-    // Validation
-    if (!name || !provider || !category || !amount || !debitOrderDate) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
+    } = result.data;
 
     const obligation = await prisma.obligation.create({
       data: {
@@ -64,11 +68,13 @@ export async function POST(request: Request) {
         provider,
         category,
         amount,
-        totalBalance: totalBalance || null,
-        interestRate: interestRate || null,
+        totalBalance: totalBalance ?? null,
+        interestRate: interestRate ?? null,
         debitOrderDate,
         isUncompromised: isUncompromised ?? true,
-        notes: notes || null,
+        isActive: isActive ?? true,
+        personId: personId ?? null,
+        notes: notes ?? null,
       },
     });
 

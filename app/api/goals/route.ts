@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { goalSchema } from '@/lib/validations';
 
 // GET /api/goals - Get all savings goals for the current user
 export async function GET() {
@@ -47,24 +48,26 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, targetAmount, currentAmount, targetDate, category, color } = body;
+    const result = goalSchema.safeParse(body);
 
-    if (!name || !targetAmount) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Name and target amount are required' },
+        { error: result.error.issues[0].message },
         { status: 400 }
       );
     }
+
+    const { name, targetAmount, currentAmount, targetDate, category, color } = result.data;
 
     const goal = await prisma.savingsGoal.create({
       data: {
         userId: session.user.id,
         name,
         targetAmount,
-        currentAmount: currentAmount || 0,
+        currentAmount: currentAmount ?? 0,
         targetDate: targetDate ? new Date(targetDate) : null,
-        category: category || 'OTHER',
-        color: color || '#8B5CF6',
+        category: category ?? 'OTHER',
+        color: color ?? '#8B5CF6',
       },
     });
 

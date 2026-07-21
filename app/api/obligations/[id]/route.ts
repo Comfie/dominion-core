@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { obligationUpdateSchema } from '@/lib/validations';
 
 // GET /api/obligations/[id] - Get a specific obligation
 export async function GET(
@@ -55,6 +56,14 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
+    const result = obligationUpdateSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0].message },
+        { status: 400 }
+      );
+    }
 
     // Verify ownership
     const existing = await prisma.obligation.findFirst({
@@ -74,7 +83,7 @@ export async function PATCH(
     const obligation = await prisma.obligation.update({
       where: { id },
       data: {
-        ...body,
+        ...result.data,
         userId: session.user.id, // Ensure userId doesn't change
       },
     });

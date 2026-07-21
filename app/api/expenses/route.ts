@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { expenseSchema } from '@/lib/validations';
 
 // GET /api/expenses - Get all expenses for the current user
 export async function GET(request: Request) {
@@ -54,14 +55,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, amount, category, date, personId, notes } = body;
+    const result = expenseSchema.safeParse(body);
 
-    if (!name || !amount || !category || !date) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Name, amount, category, and date are required' },
+        { error: result.error.issues[0].message },
         { status: 400 }
       );
     }
+
+    const { name, amount, category, date, personId, notes } = result.data;
 
     const expense = await prisma.expense.create({
       data: {

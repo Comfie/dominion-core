@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { settingsUpdateSchema } from '@/lib/validations';
 
 // GET /api/settings - Get user settings
 export async function GET() {
@@ -48,7 +49,16 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { monthlyIncome, monthlyBudget, payday, currency } = body;
+    const result = settingsUpdateSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+
+    const { monthlyIncome, monthlyBudget, payday, currency } = result.data;
 
     const settings = await prisma.settings.upsert({
       where: { userId: session.user.id },
@@ -60,10 +70,10 @@ export async function PATCH(request: Request) {
       },
       create: {
         userId: session.user.id,
-        monthlyIncome: monthlyIncome || 0,
-        monthlyBudget: monthlyBudget || null,
-        payday: payday || 25,
-        currency: currency || 'ZAR',
+        monthlyIncome: monthlyIncome ?? 0,
+        monthlyBudget: monthlyBudget ?? null,
+        payday: payday ?? 25,
+        currency: currency ?? 'ZAR',
       },
     });
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { paymentSchema } from '@/lib/validations';
 
 // GET /api/payments - Get all payments for the current user
 export async function GET(request: Request) {
@@ -46,15 +47,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { obligationId, amount, expectedAmount, adjustmentReason, paidAt, month, notes } = body;
+    const result = paymentSchema.safeParse(body);
 
-    // Validation
-    if (!obligationId || !amount || !paidAt || !month) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: result.error.issues[0].message },
         { status: 400 }
       );
     }
+
+    const { obligationId, amount, expectedAmount, adjustmentReason, paidAt, month, notes } = result.data;
 
     // Verify obligation ownership
     const obligation = await prisma.obligation.findFirst({
@@ -76,11 +78,11 @@ export async function POST(request: Request) {
         userId: session.user.id,
         obligationId,
         amount,
-        expectedAmount: expectedAmount || null,
-        adjustmentReason: adjustmentReason || null,
+        expectedAmount: expectedAmount ?? null,
+        adjustmentReason: adjustmentReason ?? null,
         paidAt: new Date(paidAt),
         month,
-        notes: notes || null,
+        notes: notes ?? null,
       },
       include: {
         obligation: true,

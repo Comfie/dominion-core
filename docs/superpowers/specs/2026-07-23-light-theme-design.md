@@ -44,9 +44,14 @@ All existing `--dc-*` variable **names** stay the same, so no component code tha
   - Shadows: dark-tuned `rgba(0,0,0,0.3–0.5)` shadow stack gets a lighter-weight equivalent so cards don't look muddy on a white background.
   - Gradients (`--dc-gradient-card`, `--dc-gradient-subtle`, `--dc-gradient-glass`): re-tuned so glass/gradient overlays read correctly against light surfaces instead of washing out.
 
-### Bug fix bundled into this work: missing `--dc-bg-secondary` token
+### Bug fix bundled into this work: missing tokens
 
-`--dc-bg-secondary` is referenced via `var(--dc-bg-secondary)` in **27 files** (form inputs, hover states, chips, list rows) but is never defined in `globals.css`. It currently resolves to nothing. This token will be properly defined in both the `.dark` and `.light` blocks as part of the token restructuring (not a separate follow-up).
+Two `--dc-*` custom properties are referenced throughout the app but never defined anywhere in `globals.css`, so they currently resolve to nothing:
+
+- `--dc-bg-secondary` — referenced in **27 files** (form inputs, hover states, chips, list rows).
+- `--dc-primary-dark` — referenced in **6 files** as a hover-state color for primary buttons/links (`app/(dashboard)/insights/page.tsx:247`, `app/(dashboard)/goals/page.tsx:346`, `components/settings/NotificationSettings.tsx:176`, `components/dashboard/DebtProgress.tsx:125`, `components/dashboard/SavingsGoals.tsx:119,232`).
+
+Both will be properly defined in both the `.dark` and `.light` blocks as part of the token restructuring — not a separate follow-up, since the whole `:root` block is being rebuilt into theme-scoped blocks anyway.
 
 ### Hardcoded raw `rgba(...)` values
 

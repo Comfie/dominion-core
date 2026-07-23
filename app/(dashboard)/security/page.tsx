@@ -51,7 +51,7 @@ export default function SecurityPage() {
     return (
         <div className="min-h-screen bg-[var(--dc-bg-primary)] pb-20">
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-[var(--dc-bg-primary)]/80 backdrop-blur-md border-b border-[var(--dc-border)]">
+            <header className="sticky top-0 z-40 bg-[var(--dc-bg-primary)]/80 backdrop-blur-md border-b border-[var(--dc-border)] pt-safe">
                 <div className="px-4 py-4">
                     <Link href="/" className="text-[var(--dc-text-muted)] text-sm mb-1 block">
                         ← Back to Dashboard

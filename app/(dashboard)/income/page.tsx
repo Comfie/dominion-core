@@ -107,7 +107,7 @@ export default function IncomePage() {
     return (
         <div className="min-h-screen bg-[var(--dc-bg-primary)]">
             {/* Header */}
-            <header className="sticky top-0 z-50 glass">
+            <header className="sticky top-0 z-50 glass pt-safe">
                 <div className="px-4 py-4 flex items-center gap-3">
                     <Link
                         href="/"

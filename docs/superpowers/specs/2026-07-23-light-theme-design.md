@@ -63,14 +63,16 @@ New `components/settings/AppearanceSettings.tsx`, matching the existing style of
 - Three options: **System** (default) / **Light** / **Dark**.
 - Uses `useTheme()` from `next-themes` directly — `theme`/`setTheme('system' | 'light' | 'dark')`. No new API route, no DB write (matches the localStorage-only persistence decision).
 
-## Visual fix scope (full pass)
+## Visual fix scope (corrected after full audit)
 
-Three categories of pre-existing color usage need updating so light mode looks correct everywhere:
+The initial exploration pass flagged "~24 files with literal Tailwind classes" and "~7 files with hardcoded hex" as at-risk. A concrete grep + manual read of every occurrence (not just a rough count) found the real picture is much smaller:
 
-1. **~24 files using literal Tailwind color classes** (e.g. `bg-black`, `text-white`) instead of `--dc-*` tokens — swap each to the appropriate token so they flip automatically with theme.
-   - **Exception:** translucent black modal/overlay scrims (e.g. `bg-black/60` behind dialogs) are theme-agnostic by design and are left as-is.
-2. **~7 files with hardcoded hex colors** — chart lines/fills (`components/dashboard/MonthOverMonthChart.tsx`, `components/dashboard/SpendingChart.tsx`) and category/goal icon colors (`components/modals/SavingsGoalModal.tsx`, `components/dashboard/SavingsGoals.tsx`, `components/dashboard/QuickAccess.tsx`, `app/(dashboard)/goals/page.tsx`). These are largely vibrant accent colors chosen to pop against a near-black background; each gets a visual check against the white background, with saturation/lightness adjusted where it washes out rather than reusing the dark-tuned value verbatim.
-3. **Chart fills/gradients** specifically need closer attention — effects tuned for a dark canvas (e.g. low-opacity white glows) typically need a different treatment on light, not just a straight token swap.
+- **Literal Tailwind classes** (`bg-black`, `text-white`, `bg-gray-*`, etc.): almost all occurrences are intentionally theme-agnostic — white text on solid-color buttons/badges/gradients (e.g. `bg-red-500 text-white`), translucent black modal overlay scrims (`bg-black/60`), and an iOS-style toggle switch thumb (`bg-white` on a colored track). None of these need to change; a colored button's white label text doesn't stop being readable when the *page* background changes theme.
+  - **One real gap:** `app/(dashboard)/import/page.tsx:666` — the "low confidence" match badge uses `bg-gray-500/20 text-gray-400`, tuned for a dark canvas. This needs to become token-based so it keeps sufficient contrast on a light background.
+- **Hardcoded hex colors** in `components/modals/SavingsGoalModal.tsx` (goal color swatches), `app/(dashboard)/goals/page.tsx` (progress bar gradient), `components/dashboard/QuickAccess.tsx` (quick-link icon accents), `components/dashboard/SavingsGoals.tsx` (100%-complete override color), `components/dashboard/MonthOverMonthChart.tsx` (bar gradient stops), and `components/dashboard/SpendingChart.tsx` (fallback slice color): all of these are deliberate vivid/mid-saturation accent or data-visualization colors, not structural background/text colors. They're legible against both a near-black and a white canvas by design (that's why they were chosen), so **no code change is needed** — confirmed by visual check during manual QA rather than left as an assumption.
+- **Chart axis/grid/tooltip styling** in `MonthOverMonthChart.tsx` and `SpendingChart.tsx` already reads `var(--dc-text-muted)` / `var(--dc-border)` / `var(--dc-bg-card)` directly (Recharts accepts CSS custom properties as style values) — already theme-safe, confirmed by reading the source, not assumed.
+
+Net real work in this category: **one file** (`import/page.tsx`), plus the `--dc-bg-secondary` token fix already covered under token restructuring. Everything else in this section is a verify-only step during the manual QA pass, not a code change.
 
 ## Testing / verification
 
@@ -84,5 +86,5 @@ No automated visual test suite exists for this app. Verification is manual: afte
 - `app/globals.css` — split `:root` values into `.dark` / `.light` blocks; add missing `--dc-bg-secondary`; theme-ify hardcoded `rgba(...)` in `.glass`/`.glass-card`/shadows/gradients.
 - `components/settings/AppearanceSettings.tsx` — new component.
 - `app/(dashboard)/settings/page.tsx` — add Appearance card.
-- ~24 files — replace literal Tailwind color classes with tokens.
-- ~7 files — adjust hardcoded hex colors for light-mode legibility (charts, goal/category icons).
+- `app/(dashboard)/import/page.tsx` — fix one dark-only badge (`bg-gray-500/20 text-gray-400`) to use theme tokens.
+- All other flagged files (goal/chart/icon accent colors) — verified theme-agnostic by design; no change, confirmed visually during manual QA.

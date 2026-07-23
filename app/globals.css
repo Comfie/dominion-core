@@ -5,6 +5,7 @@
   --dc-primary: #8b5cf6;
   /* Violet */
   --dc-primary-soft: #a78bfa;
+  --dc-primary-dark: #7c3aed;
   --dc-secondary: #06b6d4;
   /* Cyan */
   --dc-accent: #f472b6;
@@ -25,6 +26,8 @@
   /* Card background */
   --dc-bg-elevated: #232332;
   /* Popups/Modals */
+  --dc-bg-secondary: #14151f;
+  /* Inputs, hover states, chips */
 
   /* Borders */
   --dc-border: rgba(255, 255, 255, 0.08);
@@ -49,6 +52,42 @@
   --dc-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.25);
   --dc-shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
   --dc-shadow-glow-accent: 0 0 20px rgba(244, 114, 182, 0.15);
+
+  /* Glass effect backgrounds */
+  --dc-glass-bg: rgba(15, 16, 22, 0.7);
+  --dc-glass-card-bg: rgba(24, 24, 35, 0.6);
+}
+
+.light {
+  --dc-primary: #7c3aed;
+  --dc-primary-dark: #6d28d9;
+
+  --dc-bg-body: #f1f5f9;
+  --dc-bg-primary: #f8fafc;
+  --dc-bg-card: #ffffff;
+  --dc-bg-elevated: #ffffff;
+  --dc-bg-secondary: #f1f5f9;
+
+  --dc-border: rgba(15, 23, 42, 0.08);
+  --dc-border-highlight: rgba(124, 58, 237, 0.25);
+
+  --dc-text-primary: #0f172a;
+  --dc-text-secondary: #475569;
+  --dc-text-muted: #64748b;
+
+  --dc-gradient-primary: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+  --dc-gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
+  --dc-gradient-subtle: linear-gradient(to bottom right, rgba(124, 58, 237, 0.06), transparent);
+  --dc-gradient-glass: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0.0) 100%);
+
+  --dc-shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+  --dc-shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  --dc-shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.06);
+  --dc-shadow-glow: 0 0 20px rgba(124, 58, 237, 0.12);
+  --dc-shadow-glow-accent: 0 0 20px rgba(244, 114, 182, 0.12);
+
+  --dc-glass-bg: rgba(255, 255, 255, 0.7);
+  --dc-glass-card-bg: rgba(255, 255, 255, 0.6);
 }
 
 /* Base styles */
@@ -81,14 +120,14 @@ body {
 
 /* Glass morphism effect */
 .glass {
-  background: rgba(15, 16, 22, 0.7);
+  background: var(--dc-glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--dc-border);
 }
 
 .glass-card {
-  background: rgba(24, 24, 35, 0.6);
+  background: var(--dc-glass-card-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--dc-border);

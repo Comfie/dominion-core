@@ -3,6 +3,7 @@
 import { SessionProvider } from 'next-auth/react';
 import { SettingsProvider } from '@/lib/settings-context';
 import { ThemeProvider } from 'next-themes';
+import { ThemeColorSync } from '@/components/ThemeColorSync';
 import { ReactNode } from 'react';
 
 interface ProvidersProps {
@@ -12,6 +13,7 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
     return (
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="dc-theme">
+            <ThemeColorSync />
             <SessionProvider>
                 <SettingsProvider>{children}</SettingsProvider>
             </SessionProvider>

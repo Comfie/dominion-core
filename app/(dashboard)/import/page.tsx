@@ -317,7 +317,10 @@ export default function ImportPage() {
     const handleImport = async () => {
         setStep('importing');
 
-        const selectedTxs = filteredIndices.filter(i => selectedTransactions.has(i)).map(i => transactions[i]);
+        // Import everything ticked, regardless of which mode tab is active when you hit
+        // Import — a checkbox you ticked on the Income tab must not silently disappear
+        // just because you're viewing Expenses when you click the button.
+        const selectedTxs = transactions.filter((_, i) => selectedTransactions.has(i));
 
         try {
             // Import expenses (debits)
@@ -415,9 +418,13 @@ export default function ImportPage() {
         }
     };
 
-    // Calculate summary based on selected filtered transactions
-    const selectedFilteredIndices = filteredIndices.filter(i => selectedTransactions.has(i));
-    const selectedFiltered = selectedFilteredIndices.map(i => transactions[i]);
+    // Calculate summary based on everything selected, not just what the current tab shows —
+    // this needs to match what handleImport will actually send.
+    const selectedIndices = transactions.reduce<number[]>((acc, _, i) => {
+        if (selectedTransactions.has(i)) acc.push(i);
+        return acc;
+    }, []);
+    const selectedFiltered = selectedIndices.map(i => transactions[i]);
     const summary = getTransactionSummary(selectedFiltered);
     const displayIndices = showAllTransactions ? filteredIndices : filteredIndices.slice(0, 10);
 
@@ -887,10 +894,10 @@ export default function ImportPage() {
                         </button>
                         <button
                             onClick={handleImport}
-                            disabled={selectedFilteredIndices.length === 0}
+                            disabled={selectedIndices.length === 0}
                             className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Import {selectedFilteredIndices.length} Transactions
+                            Import {selectedIndices.length} Transactions
                             <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>

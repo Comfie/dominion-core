@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Check, AlertTriangle, Clock, X } from 'lucide-react';
 import { DiscountStatus } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface DiscountSafetyProps {
     status: DiscountStatus;
@@ -11,6 +12,7 @@ interface DiscountSafetyProps {
 }
 
 export function DiscountSafety({ status, className = '' }: DiscountSafetyProps) {
+    const currency = useCurrency();
     const { isSecured, levyAmount, paidDate, dueDate, daysRemaining } = status;
 
     // Determine status color and animation
@@ -101,7 +103,7 @@ export function DiscountSafety({ status, className = '' }: DiscountSafetyProps) 
                         transition={{ delay: 0.3 }}
                         className="text-xl font-bold text-[var(--dc-text-primary)]"
                     >
-                        {formatCurrency(levyAmount)}
+                        {formatCurrency(levyAmount, currency)}
                     </motion.p>
                     <p className="text-xs text-[var(--dc-text-muted)]">Whitfield Levies</p>
                 </div>

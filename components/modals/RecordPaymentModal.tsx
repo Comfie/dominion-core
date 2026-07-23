@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Check, AlertCircle } from 'lucide-react';
 import { Obligation } from '@/types/finance';
 import { format } from 'date-fns';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface RecordPaymentModalProps {
     isOpen: boolean;
@@ -23,6 +25,7 @@ const adjustmentReasons = [
 ];
 
 export function RecordPaymentModal({ isOpen, onClose, onSuccess, obligation }: RecordPaymentModalProps) {
+    const currency = useCurrency();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [hasAdjustment, setHasAdjustment] = useState(false);
@@ -148,7 +151,7 @@ export function RecordPaymentModal({ isOpen, onClose, onSuccess, obligation }: R
                                             <div className="text-right">
                                                 <p className="text-sm text-[var(--dc-text-muted)]">Expected</p>
                                                 <p className="text-lg font-bold text-[var(--dc-text-primary)]">
-                                                    R {obligation.amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                    {formatCurrency(obligation.amount, currency)}
                                                 </p>
                                             </div>
                                         </div>
@@ -225,7 +228,7 @@ export function RecordPaymentModal({ isOpen, onClose, onSuccess, obligation }: R
                                             <div className={`p-3 rounded-lg flex items-center gap-2 ${difference > 0 ? 'bg-red-500/20 border border-red-500/50' : 'bg-green-500/20 border border-green-500/50'}`}>
                                                 <AlertCircle className={`w-5 h-5 ${difference > 0 ? 'text-red-400' : 'text-green-400'}`} />
                                                 <span className={`text-sm ${difference > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                                                    {difference > 0 ? 'Paying' : 'Saving'} R {Math.abs(difference).toLocaleString('en-ZA', { minimumFractionDigits: 2 })} {difference > 0 ? 'more' : 'less'} than expected
+                                                    {difference > 0 ? 'Paying' : 'Saving'} {formatCurrency(Math.abs(difference), currency)} {difference > 0 ? 'more' : 'less'} than expected
                                                 </span>
                                             </div>
                                         )}

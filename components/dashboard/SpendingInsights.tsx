@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, AlertCircle, Info, Lightbulb } from 'lucide-react';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface Insight {
     type: 'increase' | 'decrease' | 'info' | 'warning';
@@ -44,6 +46,7 @@ const insightConfig = {
 };
 
 export function SpendingInsights({ insights, avgDailySpending, className = '' }: SpendingInsightsProps) {
+    const currency = useCurrency();
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -63,7 +66,7 @@ export function SpendingInsights({ insights, avgDailySpending, className = '' }:
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--dc-text-muted)]">Average daily spending</span>
                     <span className="text-lg font-bold text-[var(--dc-text-primary)]">
-                        R {avgDailySpending.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {formatCurrency(avgDailySpending, currency)}
                     </span>
                 </div>
             </div>

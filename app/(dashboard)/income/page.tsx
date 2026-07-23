@@ -8,12 +8,14 @@ import { ArrowLeft, Plus, Trash2, Pencil, TrendingUp, Check, X, Calendar, Refres
 import Link from 'next/link';
 import { Income, incomeSourceConfig, IncomeSource } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import { format, subMonths, addMonths } from 'date-fns';
 import { AddIncomeModal } from '@/components/modals/AddIncomeModal';
 
 export default function IncomePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const currency = useCurrency();
     const [incomes, setIncomes] = useState<Income[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -167,7 +169,7 @@ export default function IncomePage() {
                             <div>
                                 <p className="text-sm text-[var(--dc-text-muted)]">Total Extra Income</p>
                                 <p className="text-2xl font-bold text-green-400">
-                                    +{formatCurrency(totalAmount)}
+                                    +{formatCurrency(totalAmount, currency)}
                                 </p>
                             </div>
                         </div>
@@ -187,7 +189,7 @@ export default function IncomePage() {
                                 <span className="text-xs text-[var(--dc-text-muted)]">Recurring</span>
                             </div>
                             <p className="text-sm font-semibold text-[var(--dc-text-primary)]">
-                                {formatCurrency(recurringTotal)}
+                                {formatCurrency(recurringTotal, currency)}
                             </p>
                         </div>
                         <div className="p-3 rounded-lg bg-[var(--dc-bg-secondary)]">
@@ -196,7 +198,7 @@ export default function IncomePage() {
                                 <span className="text-xs text-[var(--dc-text-muted)]">One-time</span>
                             </div>
                             <p className="text-sm font-semibold text-[var(--dc-text-primary)]">
-                                {formatCurrency(oneTimeTotal)}
+                                {formatCurrency(oneTimeTotal, currency)}
                             </p>
                         </div>
                     </div>
@@ -218,7 +220,7 @@ export default function IncomePage() {
                                                 {config?.label || source}
                                             </span>
                                             <span className="text-xs font-medium text-green-400">
-                                                +{formatCurrency(amount)}
+                                                +{formatCurrency(amount, currency)}
                                             </span>
                                         </div>
                                     );
@@ -303,7 +305,7 @@ export default function IncomePage() {
 
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-semibold text-green-400">
-                                                +{formatCurrency(income.amount)}
+                                                +{formatCurrency(income.amount, currency)}
                                             </span>
                                             {editingId !== income.id && (
                                                 <div className="flex items-center gap-1">

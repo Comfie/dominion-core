@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Trash2, Pencil, CreditCard, Check, DollarSign, Calenda
 import Link from 'next/link';
 import { Obligation, Payment, categoryConfig, Category } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import { format } from 'date-fns';
 import { AddObligationModal } from '@/components/modals/AddObligationModal';
 import { EditObligationModal } from '@/components/modals/EditObligationModal';
@@ -15,6 +16,7 @@ import { EditObligationModal } from '@/components/modals/EditObligationModal';
 export default function ObligationsPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const currency = useCurrency();
     const [obligations, setObligations] = useState<Obligation[]>([]);
     const [payments, setPayments] = useState<Payment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -148,7 +150,7 @@ export default function ObligationsPage() {
                     >
                         <p className="text-xs text-[var(--dc-text-muted)] mb-1">Monthly Total</p>
                         <p className="text-xl font-bold text-[var(--dc-text-primary)]">
-                            {formatCurrency(totalMonthly)}
+                            {formatCurrency(totalMonthly, currency)}
                         </p>
                     </motion.div>
                     <motion.div
@@ -159,7 +161,7 @@ export default function ObligationsPage() {
                     >
                         <p className="text-xs text-[var(--dc-text-muted)] mb-1">Total Debt</p>
                         <p className="text-xl font-bold text-red-400">
-                            {formatCurrency(totalDebt)}
+                            {formatCurrency(totalDebt, currency)}
                         </p>
                     </motion.div>
                 </div>
@@ -167,11 +169,11 @@ export default function ObligationsPage() {
                 <div className="grid grid-cols-2 gap-3">
                     <div className="card p-3">
                         <p className="text-xs text-[var(--dc-text-muted)]">Fixed Costs</p>
-                        <p className="text-lg font-semibold text-purple-400">{formatCurrency(fixedCosts)}</p>
+                        <p className="text-lg font-semibold text-purple-400">{formatCurrency(fixedCosts, currency)}</p>
                     </div>
                     <div className="card p-3">
                         <p className="text-xs text-[var(--dc-text-muted)]">Variable Costs</p>
-                        <p className="text-lg font-semibold text-amber-400">{formatCurrency(variableCosts)}</p>
+                        <p className="text-lg font-semibold text-amber-400">{formatCurrency(variableCosts, currency)}</p>
                     </div>
                 </div>
 
@@ -248,7 +250,7 @@ export default function ObligationsPage() {
                                                 <div className="mt-1">
                                                     <div className="flex items-center justify-between text-xs mb-1">
                                                         <span className="text-[var(--dc-text-muted)]">Balance</span>
-                                                        <span className="text-red-400">{formatCurrency(obligation.totalBalance)}</span>
+                                                        <span className="text-red-400">{formatCurrency(obligation.totalBalance, currency)}</span>
                                                     </div>
                                                     <div className="h-1 bg-[var(--dc-bg-secondary)] rounded-full overflow-hidden">
                                                         <div
@@ -264,7 +266,7 @@ export default function ObligationsPage() {
 
                                         <div className="flex flex-col items-end gap-1">
                                             <span className="text-lg font-bold text-[var(--dc-text-primary)]">
-                                                {formatCurrency(obligation.amount)}
+                                                {formatCurrency(obligation.amount, currency)}
                                             </span>
                                             <div className="flex items-center gap-1">
                                                 <button

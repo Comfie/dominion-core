@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { categoryConfig, Category } from '@/types/finance';
+import { formatCurrency, getCurrencySymbol } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface CategoryData {
     category: string;
@@ -17,6 +19,7 @@ interface SpendingChartProps {
 }
 
 export function SpendingChart({ data, total, className = '' }: SpendingChartProps) {
+    const currency = useCurrency();
     const chartData = data.map(item => ({
         name: categoryConfig[item.category as Category]?.label || item.category,
         value: item.amount,
@@ -31,7 +34,7 @@ export function SpendingChart({ data, total, className = '' }: SpendingChartProp
                 <div className="bg-[var(--dc-bg-card)] border border-[var(--dc-border)] rounded-xl p-3 shadow-lg">
                     <p className="text-sm font-medium text-[var(--dc-text-primary)]">{data.name}</p>
                     <p className="text-sm text-[var(--dc-text-secondary)]">
-                        R {data.value.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                        {formatCurrency(data.value, currency)}
                     </p>
                     <p className="text-xs text-[var(--dc-text-muted)]">
                         {data.percentage.toFixed(1)}% of total
@@ -81,7 +84,7 @@ export function SpendingChart({ data, total, className = '' }: SpendingChartProp
                     {/* Center text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <span className="text-lg font-bold text-[var(--dc-text-primary)]">
-                            R {(total / 1000).toFixed(1)}k
+                            {getCurrencySymbol(currency)} {(total / 1000).toFixed(1)}k
                         </span>
                         <span className="text-xs text-[var(--dc-text-muted)]">Total</span>
                     </div>

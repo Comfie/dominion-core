@@ -5,6 +5,7 @@ import { AlertTriangle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Expense, Person, Settings } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface BudgetAlert {
     type: 'warning' | 'exceeded';
@@ -22,6 +23,7 @@ interface BudgetAlertsProps {
 }
 
 export function BudgetAlerts({ expenses, persons, settings, className = '' }: BudgetAlertsProps) {
+    const currency = useCurrency();
     const alerts: BudgetAlert[] = [];
 
     // Calculate total expenses for current month
@@ -106,7 +108,7 @@ export function BudgetAlerts({ expenses, persons, settings, className = '' }: Bu
                                 </span>
                             </div>
                             <p className="text-sm text-[var(--dc-text-muted)] mt-1">
-                                {alert.name}: {formatCurrency(alert.spent)} of {formatCurrency(alert.budget)}
+                                {alert.name}: {formatCurrency(alert.spent, currency)} of {formatCurrency(alert.budget, currency)}
                             </p>
                             {/* Progress bar */}
                             <div className="mt-2 h-1.5 bg-[var(--dc-bg-secondary)] rounded-full overflow-hidden">

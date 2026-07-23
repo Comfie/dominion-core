@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Check, Clock, AlertCircle, ShoppingBag } from 'lucide-react';
 import { UpcomingPayment, categoryConfig, Expense } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import { format, isToday, isTomorrow, compareAsc } from 'date-fns';
 import Link from 'next/link';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -22,6 +23,7 @@ interface CashflowTimelineProps {
 }
 
 export function CashflowTimeline({ upcomingPayments, expenses = [], payday, className = '' }: CashflowTimelineProps) {
+    const currency = useCurrency();
     // Combine payments and expenses into a single timeline
     const timelineItems: TimelineItem[] = [
         ...upcomingPayments.map(p => ({
@@ -142,7 +144,7 @@ export function CashflowTimeline({ upcomingPayments, expenses = [], payday, clas
                                                         ? 'text-red-400'
                                                         : 'text-[var(--dc-text-primary)]'
                                                     }`}>
-                                                    {formatCurrency(payment.obligation.amount)}
+                                                    {formatCurrency(payment.obligation.amount, currency)}
                                                 </p>
                                                 {payment.isPaid && (
                                                     <span className="text-xs text-green-400">Paid</span>
@@ -195,7 +197,7 @@ export function CashflowTimeline({ upcomingPayments, expenses = [], payday, clas
                                             </div>
                                             <div className="text-right flex-shrink-0">
                                                 <p className="text-sm font-semibold text-orange-400">
-                                                    -{formatCurrency(expense.amount)}
+                                                    -{formatCurrency(expense.amount, currency)}
                                                 </p>
                                                 <span className="text-xs text-[var(--dc-text-muted)]">Expense</span>
                                             </div>

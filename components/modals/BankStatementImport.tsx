@@ -29,6 +29,8 @@ import {
 } from '@/lib/bankStatementParser';
 import { categoryConfig, Category } from '@/types/finance';
 import { format } from 'date-fns';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface BankStatementImportProps {
     onSuccess: () => void;
@@ -53,6 +55,7 @@ const TRANSFER_KEYWORDS = [
 ];
 
 export function BankStatementImport({ onSuccess, onClose }: BankStatementImportProps) {
+    const currency = useCurrency();
     const [step, setStep] = useState<ImportStep>('upload');
     const [isDragging, setIsDragging] = useState(false);
     const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
@@ -649,11 +652,11 @@ export function BankStatementImport({ onSuccess, onClose }: BankStatementImportP
 
                                                         <div className="text-right">
                                                             <p className="text-sm font-semibold text-indigo-400">
-                                                                R {match.actualAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                                {formatCurrency(match.actualAmount, currency)}
                                                             </p>
                                                             {match.actualAmount !== match.expectedAmount && (
                                                                 <p className="text-xs text-[var(--dc-text-muted)]">
-                                                                    Expected: R {match.expectedAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                                    Expected: {formatCurrency(match.expectedAmount, currency)}
                                                                 </p>
                                                             )}
                                                         </div>
@@ -676,13 +679,13 @@ export function BankStatementImport({ onSuccess, onClose }: BankStatementImportP
                                 <div className="p-3 rounded-xl bg-red-500/10">
                                     <p className="text-xs text-[var(--dc-text-muted)]">Debits</p>
                                     <p className="text-lg font-bold text-red-400">
-                                        R {summary.totalDebits.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                        {formatCurrency(summary.totalDebits, currency)}
                                     </p>
                                 </div>
                                 <div className="p-3 rounded-xl bg-emerald-500/10">
                                     <p className="text-xs text-[var(--dc-text-muted)]">Credits</p>
                                     <p className="text-lg font-bold text-emerald-400">
-                                        R {summary.totalCredits.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                        {formatCurrency(summary.totalCredits, currency)}
                                     </p>
                                 </div>
                             </div>
@@ -748,7 +751,7 @@ export function BankStatementImport({ onSuccess, onClose }: BankStatementImportP
 
                                             <span className={`text-sm font-semibold ${tx.type === 'debit' ? 'text-red-400' : 'text-emerald-400'
                                                 }`}>
-                                                {tx.type === 'debit' ? '-' : '+'}R {tx.amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                {tx.type === 'debit' ? '-' : '+'}{formatCurrency(tx.amount, currency)}
                                             </span>
                                         </div>
                                     </div>

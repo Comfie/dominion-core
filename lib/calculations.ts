@@ -145,6 +145,20 @@ export function formatCurrency(amount: number, currency: string = 'ZAR'): string
 }
 
 /**
+ * Get just the currency symbol (e.g. "R", "$", "€", "£") for a currency code
+ */
+export function getCurrencySymbol(currency: string = 'ZAR'): string {
+  return new Intl.NumberFormat('en-ZA', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
+    .formatToParts(0)
+    .find((part) => part.type === 'currency')?.value ?? currency;
+}
+
+/**
  * Calculate debt payoff priority (highest interest first)
  */
 export function getDebtPriority(obligations: Obligation[]): Obligation[] {

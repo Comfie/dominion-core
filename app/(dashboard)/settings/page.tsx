@@ -10,10 +10,13 @@ import { Person } from '@/types/finance';
 import { AnimatePresence } from 'framer-motion';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
+import { useSettings } from '@/lib/settings-context';
+import { getCurrencySymbol } from '@/lib/calculations';
 
 export default function SettingsPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const { refetch: refetchGlobalSettings } = useSettings();
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
@@ -158,6 +161,7 @@ export default function SettingsPage() {
             }
 
             setSuccess('Settings saved successfully!');
+            await refetchGlobalSettings();
             setTimeout(() => setSuccess(''), 3000);
         } catch (err: any) {
             setError(err.message);
@@ -280,7 +284,7 @@ export default function SettingsPage() {
                                 Get alerted when total expenses approach or exceed this amount
                             </p>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--dc-text-muted)]">R</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--dc-text-muted)]">{getCurrencySymbol(settings.currency)}</span>
                                 <input
                                     type="number"
                                     step="0.01"
@@ -398,7 +402,7 @@ export default function SettingsPage() {
                                             </div>
                                             <div className="mt-2">
                                                 <div className="relative">
-                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--dc-text-muted)]">Budget R</span>
+                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--dc-text-muted)]">Budget {getCurrencySymbol(settings.currency)}</span>
                                                     <input
                                                         type="number"
                                                         step="0.01"
@@ -419,7 +423,7 @@ export default function SettingsPage() {
                                                     <div className="flex items-center gap-1 mt-0.5">
                                                         <DollarSign className="w-3 h-3 text-amber-400" />
                                                         <span className="text-xs text-amber-400">
-                                                            R {person.budgetLimit.toLocaleString()}/month
+                                                            {getCurrencySymbol(settings.currency)} {person.budgetLimit.toLocaleString()}/month
                                                         </span>
                                                     </div>
                                                 )}

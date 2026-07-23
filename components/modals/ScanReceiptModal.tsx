@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Upload, Camera, Check } from 'lucide-react';
 import { Category, categoryConfig } from '@/types/finance';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface ReceiptData {
     storeName: string;
@@ -19,6 +21,7 @@ interface ScanReceiptModalProps {
 }
 
 export function ScanReceiptModal({ isOpen, onClose, onSuccess }: ScanReceiptModalProps) {
+    const currency = useCurrency();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [preview, setPreview] = useState<string | null>(null);
@@ -185,7 +188,7 @@ export function ScanReceiptModal({ isOpen, onClose, onSuccess }: ScanReceiptModa
                                             <div className="p-3 rounded-lg bg-[var(--dc-bg-secondary)]">
                                                 <p className="text-xs text-[var(--dc-text-muted)] mb-1">Total</p>
                                                 <p className="text-[var(--dc-text-primary)] font-medium">
-                                                    R {scannedData.total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                    {formatCurrency(scannedData.total, currency)}
                                                 </p>
                                             </div>
                                         </div>

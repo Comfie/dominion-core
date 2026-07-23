@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Trash2, Pencil, Target, Calendar, TrendingUp, Check, S
 import Link from 'next/link';
 import { SavingsGoal, goalCategoryConfig, GoalCategory } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import { differenceInMonths, differenceInDays, format } from 'date-fns';
 import { SavingsGoalModal } from '@/components/modals/SavingsGoalModal';
 import { AddFundsModal } from '@/components/modals/AddFundsModal';
@@ -15,6 +16,7 @@ import { AddFundsModal } from '@/components/modals/AddFundsModal';
 export default function GoalsPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const currency = useCurrency();
     const [goals, setGoals] = useState<SavingsGoal[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
@@ -140,13 +142,13 @@ export default function GoalsPage() {
                             <div>
                                 <p className="text-sm text-[var(--dc-text-muted)]">Total Progress</p>
                                 <p className="text-2xl font-bold text-emerald-400">
-                                    {formatCurrency(totalSaved)}
+                                    {formatCurrency(totalSaved, currency)}
                                 </p>
                             </div>
                             <div className="ml-auto text-right">
                                 <p className="text-sm text-[var(--dc-text-muted)]">Target</p>
                                 <p className="text-lg font-semibold text-[var(--dc-text-primary)]">
-                                    {formatCurrency(totalTarget)}
+                                    {formatCurrency(totalTarget, currency)}
                                 </p>
                             </div>
                         </div>
@@ -255,10 +257,10 @@ export default function GoalsPage() {
                                         <div className="flex items-center justify-between text-sm">
                                             <div>
                                                 <span className="font-medium text-[var(--dc-text-primary)]">
-                                                    {formatCurrency(goal.currentAmount)}
+                                                    {formatCurrency(goal.currentAmount, currency)}
                                                 </span>
                                                 <span className="text-[var(--dc-text-muted)]">
-                                                    {' '}/ {formatCurrency(goal.targetAmount)}
+                                                    {' '}/ {formatCurrency(goal.targetAmount, currency)}
                                                 </span>
                                                 <span className="ml-2 text-xs" style={{ color: goal.color }}>
                                                     ({percentage.toFixed(0)}%)
@@ -268,7 +270,7 @@ export default function GoalsPage() {
                                                 {monthlyNeeded && monthlyNeeded > 0 && (
                                                     <span className="flex items-center gap-1">
                                                         <TrendingUp className="w-3 h-3" />
-                                                        {formatCurrency(monthlyNeeded)}/mo needed
+                                                        {formatCurrency(monthlyNeeded, currency)}/mo needed
                                                     </span>
                                                 )}
                                                 {timeRemaining && (
@@ -309,7 +311,7 @@ export default function GoalsPage() {
                                             <div>
                                                 <p className="font-medium text-[var(--dc-text-primary)]">{goal.name}</p>
                                                 <p className="text-xs text-emerald-400">
-                                                    {formatCurrency(goal.targetAmount)} achieved!
+                                                    {formatCurrency(goal.targetAmount, currency)} achieved!
                                                 </p>
                                             </div>
                                         </div>

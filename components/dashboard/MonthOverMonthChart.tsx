@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface MonthData {
     month: string;
@@ -16,6 +18,7 @@ interface MonthOverMonthChartProps {
 }
 
 export function MonthOverMonthChart({ data, changePercentage, className = '' }: MonthOverMonthChartProps) {
+    const currency = useCurrency();
     const isPositiveChange = changePercentage >= 0;
 
     const CustomTooltip = ({ active, payload, label }: any) => {
@@ -24,7 +27,7 @@ export function MonthOverMonthChart({ data, changePercentage, className = '' }: 
                 <div className="bg-[var(--dc-bg-card)] border border-[var(--dc-border)] rounded-xl p-3 shadow-lg">
                     <p className="text-sm font-medium text-[var(--dc-text-primary)]">{label}</p>
                     <p className="text-sm text-[var(--dc-text-secondary)]">
-                        R {payload[0].value.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                        {formatCurrency(payload[0].value, currency)}
                     </p>
                 </div>
             );

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Target, Plus, Calendar, TrendingUp, Check, Sparkles } from 'lucide-react';
 import { SavingsGoal, goalCategoryConfig, GoalCategory } from '@/types/finance';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import { differenceInMonths, differenceInDays, format } from 'date-fns';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ interface SavingsGoalsProps {
 }
 
 export function SavingsGoals({ goals, className = '', onAddFunds }: SavingsGoalsProps) {
+    const currency = useCurrency();
     const activeGoals = goals.filter(g => !g.isCompleted);
     const completedGoals = goals.filter(g => g.isCompleted);
     const totalSaved = goals.reduce((sum, g) => sum + g.currentAmount, 0);
@@ -91,10 +93,10 @@ export function SavingsGoals({ goals, className = '', onAddFunds }: SavingsGoals
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-[var(--dc-text-primary)]">
-                            {formatCurrency(totalSaved)}
+                            {formatCurrency(totalSaved, currency)}
                         </span>
                         <span className="text-sm text-[var(--dc-text-muted)]">
-                            / {formatCurrency(totalTarget)}
+                            / {formatCurrency(totalTarget, currency)}
                         </span>
                     </div>
                 </motion.div>
@@ -175,14 +177,14 @@ export function SavingsGoals({ goals, className = '', onAddFunds }: SavingsGoals
                                     {/* Stats */}
                                     <div className="flex items-center justify-between text-xs">
                                         <span className="text-[var(--dc-text-muted)]">
-                                            {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
+                                            {formatCurrency(goal.currentAmount, currency)} / {formatCurrency(goal.targetAmount, currency)}
                                             <span className="ml-1 text-emerald-400">({percentage.toFixed(0)}%)</span>
                                         </span>
                                         <div className="flex items-center gap-3 text-[var(--dc-text-muted)]">
                                             {monthlyNeeded && monthlyNeeded > 0 && (
                                                 <span className="flex items-center gap-1">
                                                     <TrendingUp className="w-3 h-3" />
-                                                    {formatCurrency(monthlyNeeded)}/mo
+                                                    {formatCurrency(monthlyNeeded, currency)}/mo
                                                 </span>
                                             )}
                                             {timeRemaining && (

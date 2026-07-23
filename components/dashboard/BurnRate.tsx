@@ -6,6 +6,8 @@ import { TrendingDown, ChevronDown, ChevronUp, Edit2, CheckCircle } from 'lucide
 import { Obligation, categoryConfig } from '@/types/finance';
 import Link from 'next/link';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface BurnRateProps {
     obligations: Obligation[];
@@ -14,6 +16,7 @@ interface BurnRateProps {
 }
 
 export function BurnRate({ obligations, onEditObligation, onRecordPayment }: BurnRateProps) {
+    const currency = useCurrency();
     const [isExpanded, setIsExpanded] = useState(false);
 
     const uncompromisedObligations = obligations.filter(o => o.isUncompromised);
@@ -50,7 +53,7 @@ export function BurnRate({ obligations, onEditObligation, onRecordPayment }: Bur
             {/* Total */}
             <div className="mb-4">
                 <p className="text-3xl font-bold text-red-400">
-                    R {totalBurnRate.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {formatCurrency(totalBurnRate, currency)}
                 </p>
                 <p className="text-sm text-[var(--dc-text-muted)] mt-1">
                     {uncompromisedObligations.length} obligation{uncompromisedObligations.length !== 1 ? 's' : ''}
@@ -92,7 +95,7 @@ export function BurnRate({ obligations, onEditObligation, onRecordPayment }: Bur
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <p className="text-sm font-semibold text-[var(--dc-text-primary)]">
-                                            R {obligation.amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                            {formatCurrency(obligation.amount, currency)}
                                         </p>
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             {onRecordPayment && (

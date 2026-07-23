@@ -10,6 +10,7 @@ import { SpendingChart } from '@/components/dashboard/SpendingChart';
 import { MonthOverMonthChart } from '@/components/dashboard/MonthOverMonthChart';
 import { SpendingInsights } from '@/components/dashboard/SpendingInsights';
 import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import { format, subMonths, addMonths, isSameMonth } from 'date-fns';
 
 interface SpendingAnalytics {
@@ -46,6 +47,7 @@ interface SpendingAnalytics {
 export default function InsightsPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const currency = useCurrency();
     const [analytics, setAnalytics] = useState<SpendingAnalytics | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -168,7 +170,7 @@ export default function InsightsPage() {
                                     {isCurrentMonth ? 'This Month' : format(selectedMonth, 'MMM yyyy')}
                                 </p>
                                 <p className="text-xl font-bold text-[var(--dc-text-primary)]">
-                                    {formatCurrency(analytics.currentMonth.total)}
+                                    {formatCurrency(analytics.currentMonth.total, currency)}
                                 </p>
                                 <p className="text-xs text-[var(--dc-text-muted)]">
                                     {analytics.currentMonth.transactionCount} transactions

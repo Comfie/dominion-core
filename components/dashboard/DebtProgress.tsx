@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { CreditCard, TrendingUp, Flame } from 'lucide-react';
 import { Obligation } from '@/types/finance';
 import { formatCurrency, calculateTotalDebt, getDebtPriority, calculatePayoffMonths } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface DebtProgressProps {
     obligations: Obligation[];
@@ -11,6 +12,7 @@ interface DebtProgressProps {
 }
 
 export function DebtProgress({ obligations, className = '' }: DebtProgressProps) {
+    const currency = useCurrency();
     const totalDebt = calculateTotalDebt(obligations);
     const debtPriority = getDebtPriority(obligations);
 
@@ -46,7 +48,7 @@ export function DebtProgress({ obligations, className = '' }: DebtProgressProps)
                 transition={{ delay: 0.2 }}
             >
                 <span className="text-3xl font-bold text-[var(--dc-text-primary)]">
-                    {formatCurrency(totalDebt)}
+                    {formatCurrency(totalDebt, currency)}
                 </span>
             </motion.div>
 
@@ -85,7 +87,7 @@ export function DebtProgress({ obligations, className = '' }: DebtProgressProps)
                                     )}
                                 </div>
                                 <span className="text-sm text-[var(--dc-text-secondary)]">
-                                    {formatCurrency(currentBalance)}
+                                    {formatCurrency(currentBalance, currency)}
                                 </span>
                             </div>
 

@@ -10,10 +10,13 @@ import { Expense, Person, categoryConfig, Category } from '@/types/finance';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths } from 'date-fns';
 import { AddExpenseModal } from '@/components/modals/AddExpenseModal';
 import { BankStatementImport } from '@/components/modals/BankStatementImport';
+import { formatCurrency } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 export default function ExpensesPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const currency = useCurrency();
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [persons, setPersons] = useState<Person[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -204,7 +207,7 @@ export default function ExpensesPage() {
                             <div>
                                 <p className="text-sm text-[var(--dc-text-muted)]">Total Spent</p>
                                 <p className="text-2xl font-bold text-orange-400">
-                                    R {totalAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                    {formatCurrency(totalAmount, currency)}
                                 </p>
                             </div>
                         </div>
@@ -237,7 +240,7 @@ export default function ExpensesPage() {
                                                 {config.label}
                                             </span>
                                             <span className="text-xs font-medium text-[var(--dc-text-primary)]">
-                                                R {amount.toLocaleString()}
+                                                {formatCurrency(amount, currency)}
                                             </span>
                                         </div>
                                     );
@@ -362,7 +365,7 @@ export default function ExpensesPage() {
 
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-semibold text-[var(--dc-text-primary)]">
-                                                R {expense.amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                                                {formatCurrency(expense.amount, currency)}
                                             </span>
                                             {editingId !== expense.id && (
                                                 <div className="flex items-center gap-1">

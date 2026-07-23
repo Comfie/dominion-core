@@ -5,6 +5,7 @@ import { Wallet, TrendingUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Obligation, Expense, Income } from '@/types/finance';
 import { formatCurrency, calculateBurnRate, calculateVariableCosts } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 import Link from 'next/link';
 import { GlassCard } from '@/components/ui/GlassCard';
 
@@ -17,6 +18,7 @@ interface FreeCashFlowProps {
 }
 
 export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], incomes = [], className = '' }: FreeCashFlowProps) {
+    const currency = useCurrency();
     const [displayAmount, setDisplayAmount] = useState(0);
 
     const burnRate = calculateBurnRate(obligations);
@@ -96,7 +98,7 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                     transition={{ delay: 0.2 }}
                 >
                     <span className={`text-4xl font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {displayAmount < 0 ? '-' : ''}{formatCurrency(Math.abs(displayAmount))}
+                        {displayAmount < 0 ? '-' : ''}{formatCurrency(Math.abs(displayAmount), currency)}
                     </span>
                 </motion.div>
             </div>
@@ -107,7 +109,7 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--dc-text-muted)]">Salary</span>
                     <span className="text-sm font-semibold text-[var(--dc-text-primary)]">
-                        {formatCurrency(monthlyIncome)}
+                        {formatCurrency(monthlyIncome, currency)}
                     </span>
                 </div>
 
@@ -118,7 +120,7 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                             <span className="text-xs ml-1 text-green-400">({incomes.length})</span>
                         </span>
                         <span className="text-sm font-semibold text-green-400">
-                            +{formatCurrency(totalExtraIncome)}
+                            +{formatCurrency(totalExtraIncome, currency)}
                         </span>
                     </div>
                 )}
@@ -129,14 +131,14 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--dc-text-muted)]">Fixed Costs</span>
                     <span className="text-sm text-red-400">
-                        -{formatCurrency(burnRate)}
+                        -{formatCurrency(burnRate, currency)}
                     </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--dc-text-muted)]">Variable (Obligations)</span>
                     <span className="text-sm text-amber-400">
-                        -{formatCurrency(variableCosts)}
+                        -{formatCurrency(variableCosts, currency)}
                     </span>
                 </div>
 
@@ -147,7 +149,7 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                             <span className="text-xs ml-1 text-orange-400">({expenses.length})</span>
                         </span>
                         <span className="text-sm text-orange-400">
-                            -{formatCurrency(totalExpenses)}
+                            -{formatCurrency(totalExpenses, currency)}
                         </span>
                     </div>
                 )}
@@ -157,7 +159,7 @@ export function FreeCashFlow({ monthlyIncome, obligations, expenses = [], income
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-[var(--dc-text-secondary)]">Remaining</span>
                     <span className={`text-sm font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatCurrency(freeCashFlow)}
+                        {formatCurrency(freeCashFlow, currency)}
                     </span>
                 </div>
             </div>

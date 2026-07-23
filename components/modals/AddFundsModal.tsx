@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Plus, Coins } from 'lucide-react';
 import { SavingsGoal } from '@/types/finance';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, getCurrencySymbol } from '@/lib/calculations';
+import { useCurrency } from '@/lib/settings-context';
 
 interface AddFundsModalProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ interface AddFundsModalProps {
 const quickAmounts = [100, 500, 1000, 2500, 5000];
 
 export function AddFundsModal({ isOpen, onClose, onSuccess, goal }: AddFundsModalProps) {
+    const currency = useCurrency();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [amount, setAmount] = useState('');
@@ -121,8 +123,8 @@ export function AddFundsModal({ isOpen, onClose, onSuccess, goal }: AddFundsModa
                                     />
                                 </div>
                                 <div className="flex justify-between text-xs text-[var(--dc-text-muted)]">
-                                    <span>{formatCurrency(goal.currentAmount)}</span>
-                                    <span>{formatCurrency(goal.targetAmount)}</span>
+                                    <span>{formatCurrency(goal.currentAmount, currency)}</span>
+                                    <span>{formatCurrency(goal.targetAmount, currency)}</span>
                                 </div>
                             </div>
 
@@ -140,7 +142,7 @@ export function AddFundsModal({ isOpen, onClose, onSuccess, goal }: AddFundsModa
                                                     : 'bg-[var(--dc-bg-secondary)] text-[var(--dc-text-secondary)] hover:bg-[var(--dc-bg-elevated)]'
                                                 }`}
                                         >
-                                            R{value.toLocaleString()}
+                                            {getCurrencySymbol(currency)}{value.toLocaleString()}
                                         </button>
                                     ))}
                                 </div>
@@ -164,7 +166,7 @@ export function AddFundsModal({ isOpen, onClose, onSuccess, goal }: AddFundsModa
                                     />
                                     {remaining > 0 && (
                                         <p className="text-xs text-[var(--dc-text-muted)] mt-1">
-                                            {formatCurrency(remaining)} remaining to reach your goal
+                                            {formatCurrency(remaining, currency)} remaining to reach your goal
                                         </p>
                                     )}
                                 </div>

@@ -18,9 +18,22 @@ const VALID_CATEGORIES = [
   'DINING', 'ENTERTAINMENT', 'SHOPPING'
 ];
 
+// Valid income sources from Prisma schema
+const VALID_INCOME_SOURCES = [
+  'SALARY', 'FREELANCE', 'SIDE_HUSTLE', 'SALE', 'RENTAL',
+  'GIFT', 'INVESTMENT', 'REFUND', 'OTHER'
+];
+
 function sanitizeCategory(category: string): string {
   if (VALID_CATEGORIES.includes(category)) {
     return category;
+  }
+  return 'OTHER';
+}
+
+function sanitizeIncomeSource(source: string): string {
+  if (VALID_INCOME_SOURCES.includes(source)) {
+    return source;
   }
   return 'OTHER';
 }
@@ -123,13 +136,15 @@ export async function POST(request: Request) {
             continue;
           }
 
+          const validSource = sanitizeIncomeSource(transaction.category || 'OTHER');
+
           await prisma.income.create({
             data: {
               userId: session.user.id,
               name: transaction.description,
               amount: transaction.amount,
               date: new Date(transaction.date),
-              source: 'OTHER' as any, // Income source enum is different from expense category
+              source: validSource as any,
             },
           });
 

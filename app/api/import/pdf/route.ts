@@ -143,10 +143,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Auto-categorize transactions
+    // Auto-categorize: income transactions get an income source, expenses get a category
     const categorizedTransactions = transactions.map(t => ({
       ...t,
-      category: categorizeTransaction(t.description),
+      category: t.type === 'credit' ? categorizeIncomeSource(t.description) : categorizeTransaction(t.description),
     }));
 
     return NextResponse.json({
@@ -248,7 +248,7 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 
 function categorizeTransaction(description: string): string {
   const lowerDesc = description.toLowerCase();
-  
+
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
     for (const keyword of keywords) {
       if (lowerDesc.includes(keyword.toLowerCase())) {
@@ -256,7 +256,7 @@ function categorizeTransaction(description: string): string {
       }
     }
   }
-  
+
   // Check for bank fees as OTHER (since BANKING isn't a valid category)
   const bankingKeywords = ['bank charge', 'service fee', 'monthly fee', 'atm', 'cash withdrawal', 'fee', 'facility fee', 'maintenance fee', 'payshap'];
   for (const keyword of bankingKeywords) {
@@ -264,6 +264,31 @@ function categorizeTransaction(description: string): string {
       return 'OTHER';
     }
   }
-  
+
+  return 'OTHER';
+}
+
+// Income source keywords for auto-categorization of credit transactions
+const INCOME_SOURCE_KEYWORDS: Record<string, string[]> = {
+  SALARY: ['salary', 'payroll', 'wages', 'wage deposit'],
+  FREELANCE: ['freelance', 'consulting', 'consultancy', 'invoice payment'],
+  RENTAL: ['rent received', 'rental income', 'tenant'],
+  INVESTMENT: ['dividend', 'interest paid', 'interest credit', 'unit trust', 'easyequities', 'satrix', 'investment'],
+  REFUND: ['refund', 'reversal', 'reimbursement'],
+  GIFT: ['gift'],
+  SALE: ['marketplace', 'gumtree', 'facebook marketplace'],
+};
+
+function categorizeIncomeSource(description: string): string {
+  const lowerDesc = description.toLowerCase();
+
+  for (const [source, keywords] of Object.entries(INCOME_SOURCE_KEYWORDS)) {
+    for (const keyword of keywords) {
+      if (lowerDesc.includes(keyword)) {
+        return source;
+      }
+    }
+  }
+
   return 'OTHER';
 }

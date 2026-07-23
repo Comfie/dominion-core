@@ -120,6 +120,34 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
   ],
 };
 
+// Income source keywords for auto-categorization of credit transactions
+const INCOME_SOURCE_KEYWORDS: Record<string, string[]> = {
+  SALARY: ['salary', 'payroll', 'wages', 'wage deposit'],
+  FREELANCE: ['freelance', 'consulting', 'consultancy', 'invoice payment'],
+  RENTAL: ['rent received', 'rental income', 'tenant'],
+  INVESTMENT: ['dividend', 'interest paid', 'interest credit', 'unit trust', 'easyequities', 'satrix', 'investment'],
+  REFUND: ['refund', 'reversal', 'reimbursement'],
+  GIFT: ['gift'],
+  SALE: ['marketplace', 'gumtree', 'facebook marketplace'],
+};
+
+/**
+ * Auto-categorize a credit (income) transaction based on description
+ */
+export function categorizeIncomeSource(description: string): string {
+  const lowerDesc = description.toLowerCase();
+
+  for (const [source, keywords] of Object.entries(INCOME_SOURCE_KEYWORDS)) {
+    for (const keyword of keywords) {
+      if (lowerDesc.includes(keyword)) {
+        return source;
+      }
+    }
+  }
+
+  return 'OTHER';
+}
+
 /**
  * Detect the bank format from CSV content
  */
@@ -363,8 +391,10 @@ export function parseBankStatement(
         reference = row[refIdx];
       }
 
-      // Auto-categorize
-      const category = categorizeTransaction(description, customKeywords);
+      // Auto-categorize: income transactions get an income source, expenses get a category
+      const category = type === 'credit'
+        ? categorizeIncomeSource(description)
+        : categorizeTransaction(description, customKeywords);
 
       transactions.push({
         date: parseDate(dateStr, mapping.dateFormat),

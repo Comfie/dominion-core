@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { Expense, Person, categoryConfig, Category } from '@/types/finance';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths } from 'date-fns';
 import { AddExpenseModal } from '@/components/modals/AddExpenseModal';
-import { BankStatementImport } from '@/components/modals/BankStatementImport';
 import { formatCurrency } from '@/lib/calculations';
 import { useCurrency } from '@/lib/settings-context';
 
@@ -28,7 +27,6 @@ export default function ExpensesPage() {
     const [editingCategory, setEditingCategory] = useState<string>('');
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -153,13 +151,13 @@ export default function ExpensesPage() {
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setIsImportModalOpen(true)}
+                        <Link
+                            href="/import"
                             className="w-10 h-10 rounded-xl bg-[var(--dc-bg-card)] border border-[var(--dc-border)] flex items-center justify-center hover:border-[var(--dc-primary)] transition-colors"
                             title="Import bank statement"
                         >
                             <Upload className="w-5 h-5 text-[var(--dc-text-secondary)]" />
-                        </button>
+                        </Link>
                         <button
                             onClick={() => setIsAddModalOpen(true)}
                             className="w-10 h-10 rounded-xl bg-[var(--dc-primary)] flex items-center justify-center"
@@ -473,14 +471,6 @@ export default function ExpensesPage() {
                 onClose={() => setIsAddModalOpen(false)}
                 onSuccess={fetchData}
             />
-
-            {/* Bank Statement Import Modal */}
-            {isImportModalOpen && (
-                <BankStatementImport
-                    onSuccess={fetchData}
-                    onClose={() => setIsImportModalOpen(false)}
-                />
-            )}
         </div>
     );
 }

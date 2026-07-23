@@ -130,11 +130,23 @@ export default function InsightsPage() {
                     >
                         <ChevronLeft className="w-5 h-5 text-[var(--dc-text-secondary)]" />
                     </button>
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--dc-bg-card)]">
+                    <div className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--dc-bg-card)]">
                         <Calendar className="w-4 h-4 text-[var(--dc-primary)]" />
                         <span className="text-[var(--dc-text-primary)] font-medium min-w-[120px] text-center">
                             {format(selectedMonth, 'MMMM yyyy')}
                         </span>
+                        <input
+                            type="date"
+                            value={format(selectedMonth, 'yyyy-MM-dd')}
+                            max={format(new Date(), 'yyyy-MM-dd')}
+                            onChange={(e) => {
+                                if (!e.target.value) return;
+                                const [year, month] = e.target.value.split('-').map(Number);
+                                setSelectedMonth(new Date(year, month - 1, 1));
+                            }}
+                            aria-label="Jump to month"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
                     </div>
                     <button
                         onClick={() => setSelectedMonth(addMonths(selectedMonth, 1))}

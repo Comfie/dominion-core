@@ -663,7 +663,7 @@ export default function ImportPage() {
                                                                 ? 'bg-green-500/20 text-green-400'
                                                                 : match.confidence === 'medium'
                                                                     ? 'bg-amber-500/20 text-amber-400'
-                                                                    : 'bg-gray-500/20 text-gray-400'
+                                                                    : 'bg-[var(--dc-bg-elevated)] text-[var(--dc-text-secondary)]'
                                                                 }`}>
                                                                 {match.confidence}
                                                             </span>

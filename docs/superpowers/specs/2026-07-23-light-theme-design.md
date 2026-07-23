@@ -34,10 +34,11 @@ Add `next-themes` as a dependency. It is purpose-built for this exact requiremen
 
 ### Token restructuring (`app/globals.css`)
 
-All existing `--dc-*` variable **names** stay the same, so no component code that reads `var(--dc-...)` needs to change. Only the *values* move into theme-scoped blocks:
+All existing `--dc-*` variable **names** stay the same, so no component code that reads `var(--dc-...)` needs to change.
 
-- `.dark { --dc-bg-body: #050507; ... }` — today's palette, values unchanged, just moved out of `:root`.
-- `.light { --dc-bg-body: #ffffff; ... }` — new palette. Keeps the existing brand accent hues (`--dc-primary` violet, `--dc-secondary` cyan, `--dc-accent` pink, and status colors) but flips structural tokens:
+- `:root` keeps today's dark palette values, unchanged — this is both the explicit dark theme and the safe default shown for the brief pre-hydration window before `next-themes`' blocking script runs (matches current behavior exactly, so no regression risk there).
+- A new `.light { ... }` block (matching on the `class="light"` `next-themes` sets on `<html>`) overrides just the tokens that need to flip. `:root` and `.light` have equal CSS specificity (both single-class-level selectors); `.light` wins when present because it's declared later in the file — no `.dark` block is needed.
+- The light palette keeps the existing brand accent hues (`--dc-secondary` cyan, `--dc-accent` pink, and status colors) unchanged — they're used decoratively (gradients, glows, a notification-dot badge), never as plain text, so they read fine on either background. `--dc-primary` is deepened slightly (`#8b5cf6` → `#7c3aed`) because it's used directly as link/button text color in several places and needed better contrast against white. Structural tokens flip:
   - Backgrounds: near-black → white/near-white (e.g. `--dc-bg-body: #ffffff`, `--dc-bg-primary: #f8fafc`, `--dc-bg-card: #ffffff`, `--dc-bg-elevated: #f1f5f9`).
   - Borders: `rgba(255,255,255,0.08)` → a light equivalent (e.g. `rgba(15,23,42,0.08)`).
   - Text: `#f8fafc`/`#94a3b8`/`#64748b` (light-on-dark) → dark slate equivalents with equivalent contrast ratios.

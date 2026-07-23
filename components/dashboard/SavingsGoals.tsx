@@ -71,7 +71,7 @@ export function SavingsGoals({ goals, className = '', onAddFunds }: SavingsGoals
                 </div>
                 <Link
                     href="/goals"
-                    className="p-2 rounded-lg bg-[var(--dc-card-bg)] hover:bg-[var(--dc-primary)]/20 transition-colors"
+                    className="p-2 rounded-lg bg-[var(--dc-bg-secondary)] hover:bg-[var(--dc-primary)]/20 transition-colors"
                 >
                     <Plus className="w-4 h-4 text-[var(--dc-primary)]" />
                 </Link>
@@ -147,7 +147,7 @@ export function SavingsGoals({ goals, className = '', onAddFunds }: SavingsGoals
                                             <span className="text-sm font-medium text-[var(--dc-text-primary)]">
                                                 {goal.name}
                                             </span>
-                                            <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--dc-card-bg)] text-[var(--dc-text-muted)]">
+                                            <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--dc-bg-secondary)] text-[var(--dc-text-muted)]">
                                                 {categoryInfo?.label || goal.category}
                                             </span>
                                         </div>

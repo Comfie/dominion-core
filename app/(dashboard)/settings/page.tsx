@@ -10,6 +10,7 @@ import { Person } from '@/types/finance';
 import { AnimatePresence } from 'framer-motion';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
+import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { useSettings } from '@/lib/settings-context';
 import { getCurrencySymbol } from '@/lib/calculations';
 
@@ -325,6 +326,15 @@ export default function SettingsPage() {
                             )}
                         </button>
                     </form>
+                </motion.div>
+
+                {/* Appearance */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                >
+                    <AppearanceSettings />
                 </motion.div>
 
                 {/* Family Members / Persons */}
